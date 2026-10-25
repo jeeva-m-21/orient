@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
-import { getStatus, stopDaemon, runDoctor } from './commands.js';
+import { getStatus, stopDaemon, runDoctor, runCiCheck } from './commands.js';
 import { createOrientMcpServer } from '@orient/daemon';
 import { openDatabase, initDatabase } from '@orient/core';
 import path from 'node:path';
@@ -61,6 +61,36 @@ program
       repoRoot: process.cwd()
     });
     await mcp.startStdio();
+  });
+
+program
+  .command('ci')
+  .description('Headless CI/CD verification runner for project cards')
+  .option('--max-outdated <threshold>', 'Maximum allowed ratio of outdated cards (e.g. 10%)', '15%')
+  .option('--disallow-unreported <paths>', 'Comma-separated list of paths that must have fresh cards')
+  .option('--format <format>', 'Output format: tap, junit, or json', 'tap')
+  .action((cmdOptions) => {
+    const configDir = path.join(os.homedir(), '.config', 'orient');
+    const dbPath = path.join(configDir, 'orient.db');
+    const orientDb = openDatabase(dbPath);
+    initDatabase(orientDb.raw);
+
+    const disallowList = cmdOptions.disallowUnreported
+      ? cmdOptions.disallowUnreported.split(',').map((p: string) => p.trim())
+      : undefined;
+
+    const result = runCiCheck(orientDb, {
+      maxOutdated: cmdOptions.maxOutdated,
+      disallowUnreported: disallowList,
+      format: cmdOptions.format,
+      exportSnapshots: true,
+      repoRoot: process.cwd()
+    });
+
+    console.log(result.reportOutput);
+    if (!result.passed) {
+      process.exit(1);
+    }
   });
 
 program.parse();

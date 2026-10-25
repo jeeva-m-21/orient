@@ -201,7 +201,7 @@ Goal: Provide cold-start agent bootstrapping, deterministic brief fallback gener
   - Return ranked files, conventions, and affected touchpoints in $< 100\text{ ms}$.
   - Acceptance Criteria: Task search query "add rate limit to login" returns auth routes and controllers with conventions.
 
-- [ ] **SPRINT-5.4: Headless CI/CD Runner (`orient ci`)**
+- [x] **SPRINT-5.4: Headless CI/CD Runner (`orient ci`)**
   - Implement `orient ci` command with threshold arguments (`--max-outdated=10%`, `--disallow-unreported=src/auth`).
   - Output JUnit / TAP formatted reports.
   - Auto-export verified `AGENTS.md` and `.project/context.json` snapshots.

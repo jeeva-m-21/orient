@@ -5,7 +5,8 @@ import os from 'node:os';
 import {
   getStatus,
   runDoctor,
-  exportProjectCards
+  exportProjectCards,
+  runCiCheck
 } from '../commands.js';
 import { startDaemon, type DaemonInstance } from '@orient/daemon';
 import { openDatabase, initDatabase, upsertCardRecord, type OrientDatabase } from '@orient/core';
@@ -92,5 +93,56 @@ describe('CLI Commands & Diagnostics (SPRINT-4.5)', () => {
     expect(Array.isArray(parsed)).toBe(true);
     expect(parsed.length).toBeGreaterThan(0);
     expect(parsed[0].level).toBe('repo');
+  });
+
+  describe('Headless CI/CD Runner (SPRINT-5.4)', () => {
+    it('passes when card freshness is within threshold and critical paths are mapped', () => {
+      const result = runCiCheck(orientDb, {
+        maxOutdated: '10%',
+        repoRoot: tempRepo,
+        format: 'tap'
+      });
+
+      expect(result.passed).toBe(true);
+      expect(result.outdatedPercentage).toBe(0);
+      expect(result.reportOutput).toContain('ok 1');
+
+      // Verifies auto-export snapshots
+      expect(fs.existsSync(path.join(tempRepo, 'AGENTS.md'))).toBe(true);
+      expect(fs.existsSync(path.join(tempRepo, '.project', 'context.json'))).toBe(true);
+    });
+
+    it('fails when outdated cards exceed the specified threshold', () => {
+      // Add outdated card
+      upsertCardRecord(orientDb, {
+        ...nextjsGoldenCard,
+        id: 'card:folder:src/outdated',
+        path: 'src/outdated',
+        level: 'folder',
+        state: 'Outdated'
+      });
+
+      // Total cards = 2, Outdated = 1 (50%)
+      const result = runCiCheck(orientDb, {
+        maxOutdated: '10%',
+        format: 'json'
+      });
+
+      expect(result.passed).toBe(false);
+      expect(result.outdatedPercentage).toBe(50);
+      const parsedReport = JSON.parse(result.reportOutput);
+      expect(parsedReport.passed).toBe(false);
+    });
+
+    it('fails when a path specified in --disallow-unreported is missing or outdated', () => {
+      const result = runCiCheck(orientDb, {
+        disallowUnreported: ['src/auth', 'src/billing'],
+        format: 'junit'
+      });
+
+      expect(result.passed).toBe(false);
+      expect(result.disallowedViolations.length).toBeGreaterThan(0);
+      expect(result.reportOutput).toContain('<failure');
+    });
   });
 });

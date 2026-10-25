@@ -224,3 +224,138 @@ export function exportProjectCards(orientDb: OrientDatabase, format: 'agents-md'
 
   return md;
 }
+
+export interface CiOptions {
+  maxOutdated?: number | string;
+  disallowUnreported?: string[];
+  format?: 'tap' | 'junit' | 'json';
+  exportSnapshots?: boolean;
+  repoRoot?: string;
+}
+
+export interface CiResult {
+  passed: boolean;
+  totalCards: number;
+  freshCards: number;
+  outdatedCards: number;
+  driftedCards: number;
+  unknownCards: number;
+  outdatedPercentage: number;
+  disallowedViolations: string[];
+  reportOutput: string;
+}
+
+export function runCiCheck(orientDb: OrientDatabase, options: CiOptions = {}): CiResult {
+  const cards = listCardRecords(orientDb);
+  const totalCards = cards.length;
+  const freshCards = cards.filter((c) => c.state === 'Fresh').length;
+  const driftedCards = cards.filter((c) => c.state === 'Drifted').length;
+  const outdatedCards = cards.filter((c) => c.state === 'Outdated').length;
+  const unknownCards = cards.filter((c) => c.state === 'Unknown').length;
+
+  const totalNonFresh = outdatedCards + unknownCards;
+  const outdatedPercentage = totalCards > 0 ? (totalNonFresh / totalCards) * 100 : 0;
+
+  // Parse maxOutdated threshold
+  let maxThreshold = 15; // default 15%
+  if (options.maxOutdated !== undefined) {
+    if (typeof options.maxOutdated === 'string') {
+      const match = options.maxOutdated.match(/^(\d+(?:\.\d+)?)\s*%?$/);
+      if (match && match[1]) {
+        maxThreshold = parseFloat(match[1]);
+      }
+    } else if (typeof options.maxOutdated === 'number') {
+      maxThreshold = options.maxOutdated <= 1 ? options.maxOutdated * 100 : options.maxOutdated;
+    }
+  }
+
+  const thresholdPassed = outdatedPercentage <= maxThreshold;
+
+  // Check disallowed paths
+  const disallowedViolations: string[] = [];
+  if (options.disallowUnreported && options.disallowUnreported.length > 0) {
+    for (const requiredPath of options.disallowUnreported) {
+      const found = cards.find((c) => c.path === requiredPath || c.path.startsWith(requiredPath));
+      if (!found) {
+        disallowedViolations.push(`Path "${requiredPath}" is unmapped in Orient cards`);
+      } else if (found.state === 'Outdated' || found.state === 'Unknown') {
+        disallowedViolations.push(`Path "${requiredPath}" card is currently ${found.state}`);
+      }
+    }
+  }
+
+  const passed = thresholdPassed && disallowedViolations.length === 0;
+
+  // Auto-export snapshots
+  if (options.exportSnapshots !== false && options.repoRoot) {
+    const agentsMdPath = path.join(options.repoRoot, 'AGENTS.md');
+    fs.writeFileSync(agentsMdPath, exportProjectCards(orientDb, 'agents-md'), 'utf8');
+
+    const projectDir = path.join(options.repoRoot, '.project');
+    if (!fs.existsSync(projectDir)) {
+      fs.mkdirSync(projectDir, { recursive: true });
+    }
+    const contextJsonPath = path.join(projectDir, 'context.json');
+    fs.writeFileSync(contextJsonPath, exportProjectCards(orientDb, 'json'), 'utf8');
+  }
+
+  // Format reports
+  const format = options.format || 'tap';
+  let reportOutput = '';
+
+  if (format === 'json') {
+    reportOutput = JSON.stringify(
+      {
+        passed,
+        totalCards,
+        freshCards,
+        outdatedCards,
+        driftedCards,
+        unknownCards,
+        outdatedPercentage,
+        maxThreshold,
+        disallowedViolations
+      },
+      null,
+      2
+    );
+  } else if (format === 'junit') {
+    reportOutput = `<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="orient-ci">
+  <testsuite name="Orient Architecture Health" tests="2" failures="${passed ? 0 : 1}">
+    <testcase name="Outdated threshold check (${outdatedPercentage.toFixed(1)}% &lt;= ${maxThreshold.toFixed(1)}%)">
+      ${thresholdPassed ? '' : `<failure message="Outdated cards ratio (${outdatedPercentage.toFixed(1)}%) exceeds threshold (${maxThreshold.toFixed(1)}%)" />`}
+    </testcase>
+    <testcase name="Critical disallowed paths freshness check">
+      ${disallowedViolations.length === 0 ? '' : `<failure message="${disallowedViolations.join('; ')}" />`}
+    </testcase>
+  </testsuite>
+</testsuites>`;
+  } else {
+    // TAP format
+    reportOutput = `TAP version 14\n1..2\n`;
+    if (thresholdPassed) {
+      reportOutput += `ok 1 - Outdated cards within threshold (${outdatedPercentage.toFixed(1)}% <= ${maxThreshold.toFixed(1)}%)\n`;
+    } else {
+      reportOutput += `not ok 1 - Outdated cards ratio (${outdatedPercentage.toFixed(1)}%) exceeds maximum threshold (${maxThreshold.toFixed(1)}%)\n`;
+    }
+
+    if (disallowedViolations.length === 0) {
+      reportOutput += `ok 2 - All critical paths verified fresh\n`;
+    } else {
+      reportOutput += `not ok 2 - Critical path violations: ${disallowedViolations.join('; ')}\n`;
+    }
+  }
+
+  return {
+    passed,
+    totalCards,
+    freshCards,
+    outdatedCards,
+    driftedCards,
+    unknownCards,
+    outdatedPercentage,
+    disallowedViolations,
+    reportOutput
+  };
+}
