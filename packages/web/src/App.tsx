@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import type { Card } from '@orient/schema';
 import { nextjsGoldenCard } from '@orient/fixtures/cards';
-import { Shell } from './components/layout/Shell.js';
+import { Shell, type ShellView } from './components/layout/Shell.js';
 import { RepositoryTree, type TreeNode } from './components/tree/RepositoryTree.js';
 import { CardPanel } from './components/card/CardPanel.js';
 import { CodeDrawer } from './components/drawer/CodeDrawer.js';
 import { CommandPalette, type CommandPaletteItem } from './components/palette/CommandPalette.js';
+import { OverviewScreen } from './components/screens/OverviewScreen.js';
+import { ContainerDiagram } from './components/diagrams/ContainerDiagram.js';
+import { InboxScreen } from './components/screens/InboxScreen.js';
+import { ActivityScreen } from './components/screens/ActivityScreen.js';
 
 const INITIAL_TREE_DATA: TreeNode[] = [
   {
@@ -110,9 +114,10 @@ export function createSessionToken(userId: string): string {
 export function App(): React.JSX.Element {
   const [currentCard, setCurrentCard] = useState<Card>(nextjsGoldenCard);
   const [isFocusMode, setIsFocusMode] = useState<boolean>(false);
+  const [focusStepIndex, setFocusStepIndex] = useState<number>(0);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState<boolean>(false);
   const [isDarkTheme, setIsDarkTheme] = useState<boolean>(true);
-  const [activeView, setActiveView] = useState<'overview' | 'inbox' | 'explore' | 'activity' | 'health' | 'setup'>('explore');
+  const [activeView, setActiveView] = useState<ShellView>('explore');
 
   // Code Drawer State
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
@@ -213,8 +218,11 @@ export function App(): React.JSX.Element {
         path: item.path,
         isFolder: true
       });
+      setActiveView('explore');
     }
   };
+
+  const startHereCards = ['root', 'src/auth', 'src/controllers', 'src/billing'];
 
   return (
     <Shell
@@ -231,20 +239,84 @@ export function App(): React.JSX.Element {
       onChangeView={setActiveView}
       activeAgentStatus="Claude reported: src/auth updated (Fresh) · Stdio MCP connected"
     >
-      {/* If Focus Mode: render clean centered single pane */}
+      {/* 1. If Focus Mode is Active */}
       {isFocusMode ? (
-        <div className="flex-1 flex justify-center p-6 overflow-y-auto">
+        <div className="flex-1 flex flex-col items-center justify-start p-6 overflow-y-auto">
+          {/* Start Here Progress Bar */}
+          <div className="w-full max-w-2xl flex items-center justify-between pb-4 mb-2 text-xs font-mono text-text-faint border-b border-border">
+            <span>FOCUS MODE · STEP {focusStepIndex + 1} OF {startHereCards.length}</span>
+            <div className="flex items-center gap-2">
+              <button
+                data-testid="focus-back-btn"
+                disabled={focusStepIndex === 0}
+                onClick={() => setFocusStepIndex((i) => Math.max(0, i - 1))}
+                className="px-2 py-1 rounded bg-surface border border-border disabled:opacity-40"
+              >
+                Back
+              </button>
+              <button
+                data-testid="focus-next-btn"
+                disabled={focusStepIndex >= startHereCards.length - 1}
+                onClick={() => setFocusStepIndex((i) => Math.min(startHereCards.length - 1, i + 1))}
+                className="px-2 py-1 rounded bg-accent text-white disabled:opacity-40"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+
           <div className="w-full max-w-2xl">
             <CardPanel
               card={currentCard}
               onOpenFile={handleOpenFileInDrawer}
               onOpenEditor={(p) => alert(`Open in editor: ${p}`)}
-              onNextCard={() => alert('Advancing to next recommended card...')}
+              onNextCard={() => setFocusStepIndex((i) => (i + 1) % startHereCards.length)}
             />
           </div>
         </div>
+      ) : activeView === 'overview' ? (
+        /* 2. Overview Screen with Container Diagram */
+        <div className="flex-1 overflow-y-auto space-y-6">
+          <OverviewScreen
+            repoCard={nextjsGoldenCard}
+            onNavigateToCard={(p) => {
+              handleSelectTreeNode({ id: p, name: p, path: p, isFolder: true });
+              setActiveView('explore');
+            }}
+            onStartExploring={() => {
+              handleSelectTreeNode({ id: 'src-auth', name: 'auth', path: 'src/auth', isFolder: true });
+              setActiveView('explore');
+            }}
+          />
+          <div className="max-w-5xl mx-auto px-8 pb-12">
+            <ContainerDiagram
+              onSelectNode={(nodeId) => {
+                if (nodeId === 'auth') {
+                  handleSelectTreeNode({ id: 'src-auth', name: 'auth', path: 'src/auth', isFolder: true });
+                  setActiveView('explore');
+                }
+              }}
+            />
+          </div>
+        </div>
+      ) : activeView === 'inbox' ? (
+        /* 3. Review Inbox Screen */
+        <InboxScreen
+          onReviewPath={(p) => {
+            handleSelectTreeNode({ id: p, name: p, path: p, isFolder: true });
+            setActiveView('explore');
+          }}
+        />
+      ) : activeView === 'activity' ? (
+        /* 4. Active Agents Activity Screen */
+        <ActivityScreen
+          onSelectPath={(p) => {
+            handleSelectTreeNode({ id: p, name: p, path: p, isFolder: true });
+            setActiveView('explore');
+          }}
+        />
       ) : (
-        /* Standard View: Tree on Left + Card on Right */
+        /* 5. Explorer Standard View: Tree on Left + Card on Right */
         <div className="flex flex-1 overflow-hidden">
           <div className="w-72 flex-shrink-0">
             <RepositoryTree

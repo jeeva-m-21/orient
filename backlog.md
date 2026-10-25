@@ -256,7 +256,7 @@ Goal: Build the calm, accessible, keyboard-driven web interface with virtualized
 
 Goal: Implement the high-level Overview screen, Container/Neighborhood diagrams with ELK, the review Inbox, Activity timeline, and single-pane Focus mode.
 
-- [ ] **SPRINT-7.1: Overview Screen & Runtime Strip**
+- [x] **SPRINT-7.1: Overview Screen & Runtime Strip**
   - Render Repo card: name, one-line purpose, stack versions, entry points, copyable run commands.
   - Render Runtime strip: live chips for detected ports/services with up/down indicator and compose source tooltip.
   - Top 5 structural findings (duplicate configs, untested areas, unused folders).
@@ -264,7 +264,7 @@ Goal: Implement the high-level Overview screen, Container/Neighborhood diagrams 
   - Start Here path with [Start] button.
   - Acceptance Criteria: New user can understand repo stack, commands, and health in $< 10\text{ s}$.
 
-- [ ] **SPRINT-7.2: Container & Neighborhood Diagrams (ELK Layout)**
+- [x] **SPRINT-7.2: Container & Neighborhood Diagrams (ELK Layout)**
   - Implement React Flow canvas with ELK layered left-to-right deterministic layout.
   - Container diagram: capped at 7 visible nodes with expandable clusters.
   - Neighborhood view: selected card + direct 1-hop imports/importers.
@@ -272,21 +272,21 @@ Goal: Implement the high-level Overview screen, Container/Neighborhood diagrams 
   - Export diagram as SVG or Mermaid.
   - Acceptance Criteria: Diagrams layout deterministically without crossing hairballs; selecting nodes dims unrelated elements.
 
-- [ ] **SPRINT-7.3: Inbox Screen & Review Tracking**
+- [x] **SPRINT-7.3: Inbox Screen & Review Tracking**
   - Implement Inbox displaying up to 5 prioritized items (unreported changes, outdated touched cards, collisions, new dependencies).
   - Score items: $\text{severity} \times \text{recency} \times (1 - \text{seen})$.
   - "Mark reviewed" action records `(path, hash, timestamp)`.
   - Empty state displays calm "All clear".
   - Acceptance Criteria: Clicking an inbox item jumps tree to path and opens delta diff; reviewing all items transitions to "All clear".
 
-- [ ] **SPRINT-7.4: Activity Screen & Agent Monitoring**
+- [x] **SPRINT-7.4: Activity Screen & Agent Monitoring**
   - Top agent bar: agent name, stable color, current task sentence, step pill (plan ▸ edit ▸ test ▸ done).
   - Timeline of file change bursts grouped by agent task session.
   - Collision warning banner if multiple agents edit the same directory.
   - Unreported changes pinned at top.
   - Acceptance Criteria: Multiple agents executing edits are attributed with distinct colors; collisions trigger banner.
 
-- [ ] **SPRINT-7.5: Single-Pane Focus Mode & Adaptivity**
+- [x] **SPRINT-7.5: Single-Pane Focus Mode & Adaptivity**
   - Focus Mode (`F` key): collapses tree and sidebar, rendering a single centered card (max 640px) with larger type and Back/Next navigation.
   - Suggested automatically after repeated dense view abandonment (never forced).
   - Start Here ordered progression: 1 of 6, 2 of 6, etc.

@@ -108,4 +108,122 @@ test.describe('Orient Explorer & Card E2E User Journeys (SPRINT-6.6)', () => {
     // Capture screenshot of Focus Mode
     await page.screenshot({ path: path.join(screenshotDir, '05-focus-mode.png'), fullPage: true });
   });
+
+  test('Journey 6: Overview screen and container topology diagram (SPRINT-7.1, SPRINT-7.2)', async ({ page }) => {
+    await page.goto('/');
+
+    // Navigate to Overview screen via rail
+    await page.getByTestId('nav-overview').click();
+
+    // Verify Overview Screen & Container Diagram
+    await expect(page.getByTestId('overview-screen')).toBeVisible();
+    await expect(page.getByTestId('container-diagram')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'acme-commerce' })).toBeVisible();
+    await expect(page.getByText('System Container Topology')).toBeVisible();
+
+    // Verify SVG Nodes
+    const gatewayNode = page.getByTestId('diagram-node-gateway');
+    await expect(gatewayNode).toBeVisible();
+    await gatewayNode.click();
+
+    // Verify Mermaid Export button
+    const exportBtn = page.getByTestId('export-mermaid-btn');
+    await expect(exportBtn).toBeVisible();
+
+    // Capture screenshot
+    await page.screenshot({ path: path.join(screenshotDir, '06-overview-screen.png'), fullPage: true });
+  });
+
+  test('Journey 7: Start Here Path navigation from Overview (SPRINT-7.1)', async ({ page }) => {
+    await page.goto('/');
+
+    // Navigate to Overview screen
+    await page.getByTestId('nav-overview').click();
+    await expect(page.getByTestId('overview-screen')).toBeVisible();
+
+    // Click "Start Here Path" button
+    const startHereBtn = page.getByTestId('start-here-btn');
+    await expect(startHereBtn).toBeVisible();
+    await startHereBtn.click();
+
+    // Verify transition to Explorer view with src/auth selected
+    await expect(page.getByTestId('repository-tree')).toBeVisible();
+    await expect(page.getByTestId('card-panel')).toContainText('src/auth');
+
+    // Capture screenshot
+    await page.screenshot({ path: path.join(screenshotDir, '07-start-here-transition.png'), fullPage: true });
+  });
+
+  test('Journey 8: Review Inbox screen triage and empty state (SPRINT-7.3)', async ({ page }) => {
+    await page.goto('/');
+
+    // Navigate to Inbox screen via rail
+    await page.getByTestId('nav-inbox').click();
+
+    // Verify Inbox Screen & Pending Items
+    await expect(page.getByTestId('inbox-screen')).toBeVisible();
+    await expect(page.getByText('Review Inbox')).toBeVisible();
+    await expect(page.getByText('Outdated Card: Stripe Webhook Changes')).toBeVisible();
+
+    // Capture screenshot with triage items
+    await page.screenshot({ path: path.join(screenshotDir, '08-inbox-screen.png'), fullPage: true });
+
+    // Mark All Reviewed
+    const markAllBtn = page.getByTestId('mark-all-reviewed-btn');
+    await expect(markAllBtn).toBeVisible();
+    await markAllBtn.click();
+
+    // Verify calm honest "All Clear" empty state
+    await expect(page.getByTestId('empty-inbox-state')).toBeVisible();
+    await expect(page.getByText('All Clear')).toBeVisible();
+
+    // Capture screenshot of empty state
+    await page.screenshot({ path: path.join(screenshotDir, '09-inbox-empty-state.png'), fullPage: true });
+  });
+
+  test('Journey 9: Activity screen monitoring real-time agent tasks (SPRINT-7.4)', async ({ page }) => {
+    await page.goto('/');
+
+    // Navigate to Activity screen via rail
+    await page.getByTestId('nav-activity').click();
+
+    // Verify Activity Screen
+    await expect(page.getByTestId('activity-screen')).toBeVisible();
+    await expect(page.getByText('Active Agent Sessions')).toBeVisible();
+    await expect(page.getByText('Claude Code')).toBeVisible();
+    await expect(page.getByText('Implementing rate limiting on /auth/login route')).toBeVisible();
+    await expect(page.getByText('Cursor Agent')).toBeVisible();
+
+    // Capture screenshot
+    await page.screenshot({ path: path.join(screenshotDir, '10-activity-screen.png'), fullPage: true });
+  });
+
+  test('Journey 10: Single-pane Focus Mode walkthrough navigation (SPRINT-7.5)', async ({ page }) => {
+    await page.goto('/');
+
+    // Toggle Focus Mode
+    await page.getByTestId('focus-mode-toggle').click();
+
+    // Verify Focus Mode Header
+    await expect(page.getByText('FOCUS MODE · STEP 1 OF 4')).toBeVisible();
+
+    // Click Next
+    const nextBtn = page.getByTestId('focus-next-btn');
+    await expect(nextBtn).toBeVisible();
+    await nextBtn.click();
+
+    // Verify Step 2
+    await expect(page.getByText('FOCUS MODE · STEP 2 OF 4')).toBeVisible();
+
+    // Click Back
+    const backBtn = page.getByTestId('focus-back-btn');
+    await expect(backBtn).toBeVisible();
+    await backBtn.click();
+
+    // Verify Step 1
+    await expect(page.getByText('FOCUS MODE · STEP 1 OF 4')).toBeVisible();
+
+    // Capture screenshot
+    await page.screenshot({ path: path.join(screenshotDir, '11-focus-mode-walkthrough.png'), fullPage: true });
+  });
 });
