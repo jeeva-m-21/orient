@@ -185,7 +185,7 @@ Goal: Implement the Fastify server, loopback security boundaries, SSE event bus,
 
 Goal: Provide cold-start agent bootstrapping, deterministic brief fallback generator, lexical task search, and headless CI verification.
 
-- [ ] **SPRINT-5.1: Cold Start Bootstrap Prompt Generator**
+- [x] **SPRINT-5.1: Cold Start Bootstrap Prompt Generator**
   - Generate copyable bootstrap prompt instructing developer's active agent to inspect top-level folders and write cards into `.project/cards/*.json`.
   - Acceptance Criteria: Generated prompt adheres to `@orient/schema` and produces cards that pass hard gate validation.
 
