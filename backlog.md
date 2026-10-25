@@ -123,7 +123,7 @@ Goal: Implement rebuildable SQLite caching, durable `.project/cards/` JSON stora
   - Check role against fixed 23-item vocabulary.
   - Acceptance Criteria: Validator rejects invalid reports with descriptive rejection errors; valid reports pass into store.
 
-- [ ] **SPRINT-3.4: Optimistic Concurrency Control & Per-Path Mutex**
+- [x] **SPRINT-3.4: Optimistic Concurrency Control & Per-Path Mutex**
   - Implement integer `version` checking for cards (`expectedVersion`).
   - Implement async per-path in-memory lock during report ingestion.
   - Implement 3-way disjoint slot merge (concurrent non-conflicting field updates merge cleanly; conflicting fields return error).
