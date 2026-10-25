@@ -154,7 +154,7 @@ Goal: Implement the Fastify server, loopback security boundaries, SSE event bus,
   - Path traversal guard: reject any path attempting to escape repository root via `path.relative`.
   - Acceptance Criteria: Security tests verify unauthorized requests, invalid origins, and directory traversal attempts (`../../`) return 401/403.
 
-- [ ] **SPRINT-4.3: Realtime Event Bus & SSE Stream**
+- [x] **SPRINT-4.3: Realtime Event Bus & SSE Stream**
   - Implement in-process event bus emitting typed events (`scan.progress`, `card.updated`, `status.changed`, `agent.state`, `inbox.updated`).
   - Fastify SSE endpoint `/events?project=` streaming typed JSON payloads.
   - Acceptance Criteria: Client connected to SSE receives live patch events on file changes.

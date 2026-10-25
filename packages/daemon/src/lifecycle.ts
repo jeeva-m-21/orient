@@ -5,6 +5,7 @@ import crypto from 'node:crypto';
 import fastify, { type FastifyInstance, type FastifyRequest, type FastifyReply } from 'fastify';
 import cors from '@fastify/cors';
 import { validateSafePath } from '@orient/schema';
+import { EventBus } from './eventBus.js';
 
 export interface DaemonConfig {
   port?: number;
@@ -12,6 +13,7 @@ export interface DaemonConfig {
   configDir?: string;
   repoRoot?: string;
   token?: string;
+  eventBus?: EventBus;
 }
 
 export interface LockfileData {
@@ -25,6 +27,7 @@ export interface DaemonInstance {
   port: number;
   token: string;
   server: FastifyInstance;
+  eventBus: EventBus;
   isRunning: boolean;
   stop: () => Promise<void>;
 }
@@ -93,6 +96,7 @@ export async function startDaemon(config: DaemonConfig = {}): Promise<DaemonInst
   const token = config.token || crypto.randomBytes(32).toString('hex');
   const host = config.host || '127.0.0.1';
   const startPort = config.port || 4477;
+  const eventBus = config.eventBus || new EventBus();
 
   // Clean zombie lockfiles before attempting port bind
   cleanupZombieLockfile(configDir);
@@ -183,6 +187,27 @@ export async function startDaemon(config: DaemonConfig = {}): Promise<DaemonInst
       return { path: safeResult.normalizedPath, content };
     });
 
+    // 5. Realtime SSE Stream
+    app.get('/events', (request: FastifyRequest, reply: FastifyReply) => {
+      reply.raw.setHeader('Content-Type', 'text/event-stream');
+      reply.raw.setHeader('Cache-Control', 'no-cache, no-transform');
+      reply.raw.setHeader('Connection', 'keep-alive');
+      reply.raw.setHeader('X-Accel-Buffering', 'no');
+      reply.raw.flushHeaders();
+
+      reply.raw.write(
+        `event: connected\ndata: ${JSON.stringify({ timestamp: new Date().toISOString() })}\n\n`
+      );
+
+      const unsubscribe = eventBus.subscribe((event) => {
+        reply.raw.write(`event: ${event.type}\ndata: ${JSON.stringify(event.payload)}\n\n`);
+      });
+
+      request.raw.on('close', () => {
+        unsubscribe();
+      });
+    });
+
     try {
       await app.listen({ port: activePort, host });
       serverInstance = app;
@@ -236,6 +261,7 @@ export async function startDaemon(config: DaemonConfig = {}): Promise<DaemonInst
     port: activePort,
     token,
     server: serverInstance,
+    eventBus,
     get isRunning() {
       return isRunning;
     },
