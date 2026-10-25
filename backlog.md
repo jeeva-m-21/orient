@@ -26,7 +26,7 @@ Goal: Establish the repository infrastructure, strict TypeScript configurations,
   - Define REST API request/response schemas for `/api/projects`, `/api/p/:id/tree`, `/api/p/:id/card`, `/api/p/:id/inbox`, and `/api/p/:id/review`.
   - Acceptance Criteria: Full coverage of all inter-process API boundaries with bidirectional Zod parsing tests.
 
-- [ ] **SPRINT-0.4: Defense-in-Depth Schema Guards & Sanitizers (`@orient/schema`)**
+- [x] **SPRINT-0.4: Defense-in-Depth Schema Guards & Sanitizers (`@orient/schema`)**
   - Implement prompt-injection sanitization functions: strip markdown command triggers, HTML/script tags, and enforce length limits (purpose $\le 140$, why $\le 200$, oneThing $\le 12$ words).
   - Implement path traversal sanitizer: normalize paths and verify relative path does not escape repository root.
   - Acceptance Criteria: Unit tests assert malicious injections (`<script>`, `System: ignore rules`, `../../etc/passwd`) are either stripped or rejected.
