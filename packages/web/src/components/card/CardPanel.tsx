@@ -4,6 +4,7 @@ import { StatusBadge, SourceBadge, AgentBadge, ConfidenceBadge } from '../common
 import {
   FileCode,
   ShieldAlert,
+  AlertTriangle,
   ArrowRight,
   ExternalLink,
   CheckCircle2,
@@ -85,6 +86,20 @@ export function CardPanel({
           ))}
         </div>
       </div>
+
+      {/* Outdated Delta Banner */}
+      {state === 'Outdated' && (
+        <div
+          data-testid="outdated-delta-banner"
+          className="px-6 py-2.5 bg-status-outdated-bg border-b border-status-outdated-fg/30 flex items-center justify-between text-xs"
+        >
+          <div className="flex items-center gap-2 text-status-outdated-fg font-medium">
+            <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+            <span>Interface drift detected (+2 exports, -1 route changed since described)</span>
+          </div>
+          <span className="font-mono text-[11px] text-text-faint">Anchor: {meta.anchor.commit.slice(0, 7)}</span>
+        </div>
+      )}
 
       {/* 2. Signature 10-Slot Body */}
       <div className="flex-1 overflow-y-auto p-6 space-y-6">
@@ -290,9 +305,25 @@ export function CardPanel({
         </section>
 
         {/* Slot 10: Origin, Evidence & Hashes */}
-        <section className="pt-4 border-t border-border/50 flex items-center justify-between text-xs text-text-faint font-code">
-          <span>Commit: {meta.anchor.commit.slice(0, 7)}</span>
-          <span>Updated: {new Date(meta.updatedAt).toLocaleDateString()}</span>
+        <section className="pt-4 border-t border-border/50 space-y-2 text-xs font-code">
+          <div className="flex items-center justify-between text-text-faint">
+            <span>Commit: {meta.anchor.commit.slice(0, 7)}</span>
+            <span>Updated: {new Date(meta.updatedAt).toLocaleDateString()}</span>
+          </div>
+          {meta.evidence && meta.evidence.length > 0 && (
+            <div className="flex items-center gap-1.5 flex-wrap pt-1">
+              <span className="text-[10px] uppercase font-mono text-text-faint">Evidence Citations:</span>
+              {meta.evidence.map((ev, i) => (
+                <span
+                  key={i}
+                  className="px-2 py-0.5 rounded bg-surface-2 border border-border text-[11px] text-text-muted"
+                  title={ev.note || ev.ref}
+                >
+                  {ev.kind}: {ev.ref}
+                </span>
+              ))}
+            </div>
+          )}
         </section>
       </div>
 

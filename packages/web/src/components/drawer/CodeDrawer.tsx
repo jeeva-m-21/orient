@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Copy, Check, FileCode } from 'lucide-react';
+import { X, Copy, Check, FileCode, ExternalLink } from 'lucide-react';
 
 export interface CodeDrawerProps {
   isOpen: boolean;
@@ -50,6 +50,13 @@ export function CodeDrawer({
         </div>
 
         <div className="flex items-center gap-1">
+          <a
+            href={`vscode://file/${filePath}`}
+            className="p-1.5 text-text-muted hover:text-text rounded-control hover:bg-surface-2 transition-colors inline-flex items-center"
+            title="Open in VS Code"
+          >
+            <ExternalLink className="w-4 h-4" />
+          </a>
           <button
             onClick={handleCopy}
             className="p-1.5 text-text-muted hover:text-text rounded-control hover:bg-surface-2 transition-colors"

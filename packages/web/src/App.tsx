@@ -324,6 +324,7 @@ export function App(): React.JSX.Element {
               selectedPath={currentCard.path}
               onSelectNode={handleSelectTreeNode}
               onOpenEditor={(p) => alert(`Open in editor: ${p}`)}
+              onMarkReviewed={(p) => alert(`Mark reviewed: ${p}`)}
             />
           </div>
 

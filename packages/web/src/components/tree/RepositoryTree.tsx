@@ -27,6 +27,7 @@ export interface RepositoryTreeProps {
   selectedPath?: string;
   onSelectNode: (node: TreeNode) => void;
   onOpenEditor?: (path: string) => void;
+  onMarkReviewed?: (path: string) => void;
   className?: string;
 }
 
@@ -35,6 +36,7 @@ export function RepositoryTree({
   selectedPath,
   onSelectNode,
   onOpenEditor,
+  onMarkReviewed,
   className = ''
 }: RepositoryTreeProps): React.JSX.Element {
   const [filterText, setFilterText] = useState('');
@@ -122,6 +124,8 @@ export function RepositoryTree({
                 toggleExpand(node.id);
               } else if (e.key === 'o' && onOpenEditor) {
                 onOpenEditor(node.path);
+              } else if (e.key === 'r' && onMarkReviewed) {
+                onMarkReviewed(node.path);
               }
             }}
             tabIndex={0}
