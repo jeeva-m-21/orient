@@ -16,7 +16,7 @@ export function computeBlobHash(content: string | Buffer): string {
 
 const JS_BLOCK_COMMENT_REGEX = /\/\*[\s\S]*?\*\//g;
 const JS_LINE_COMMENT_REGEX = /\/\/.*$/gm;
-const PYTHON_COMMENT_REGEX = /#.*$/gm;
+const PYTHON_COMMENT_REGEX = /(?<=^|\s)#(?![a-zA-Z_$]).*$/gm;
 
 /**
  * Normalizes source code by stripping comments and collapsing whitespace/formatting.
@@ -54,7 +54,8 @@ export function computeInterfaceHash(surface: InterfaceSurfaceInput): string {
   const sortedExports = [...surface.exports].sort();
   const sortedImports = [...surface.imports].sort();
   const sortedRoutes = [...surface.routes].sort((a, b) =>
-    `${a.method}:${a.path}`.localeCompare(`${b.method}:${b.path}`)
+    `${a.method}:${a.path}`.localeCompare(`${b.method}:${b.path}`) ||
+    (a.handlerRef ?? '').localeCompare(b.handlerRef ?? '')
   );
   const sortedEnvVars = [...(surface.envVars ?? [])].sort();
   const sortedPorts = [...(surface.ports ?? [])].sort((a, b) => a - b);

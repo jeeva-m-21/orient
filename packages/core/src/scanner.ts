@@ -32,7 +32,7 @@ export interface TreeScanResult {
 const NOISE_PATTERNS: { category: NoiseCategory; regex: RegExp }[] = [
   {
     category: 'dependencies',
-    regex: /(^|\/)(node_modules|vendor\/bundle)(\/|$)/i
+    regex: /(^|\/)(node_modules|vendor\/bundle|venv|\.venv)(\/|$)/i
   },
   {
     category: 'build-output',

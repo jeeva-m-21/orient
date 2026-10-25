@@ -63,6 +63,16 @@ describe('Multi-Tier Hashing Engine (SPRINT-1.2)', () => {
 
       expect(hA).not.toBe(hB);
     });
+
+    it('preserves JS/TS private class fields and does not confuse them with Python comments', () => {
+      const classA = `class Service { #secretKey = 1; }`;
+      const classB = `class Service { #otherKey = 2; }`;
+
+      const hA = computeNormalizedHash(classA);
+      const hB = computeNormalizedHash(classB);
+
+      expect(hA).not.toBe(hB);
+    });
   });
 
   describe('computeInterfaceHash', () => {

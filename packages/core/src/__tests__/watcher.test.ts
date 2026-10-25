@@ -63,6 +63,31 @@ describe('Adaptive Watcher & Watcher Storm Suppression (SPRINT-1.5)', () => {
     }
   });
 
+  it('handles massive 5,000-file bursts without event loop saturation', () => {
+    const events: WatcherEvent[] = [];
+    const watcher = new AdaptiveWatcher({
+      debounceMs: 200,
+      stormThreshold: 50,
+      onEvent: (event) => events.push(event)
+    });
+
+    const start = performance.now();
+    for (let i = 0; i < 5000; i++) {
+      watcher.simulateFileChange(`packages/large_module/file_${i}.ts`);
+    }
+    const elapsed = performance.now() - start;
+
+    expect(elapsed).toBeLessThan(100); // Enqueued in under 100ms
+    vi.advanceTimersByTime(200);
+
+    expect(events).toHaveLength(1);
+    expect(events[0]?.type).toBe('storm');
+    if (events[0]?.type === 'storm') {
+      expect(events[0].count).toBe(5000);
+      expect(events[0].requiresSnapshotDiff).toBe(true);
+    }
+  });
+
   it('filters out blacklisted sensitive paths and noise directories from watch queue', () => {
     const events: WatcherEvent[] = [];
     const watcher = new AdaptiveWatcher({
