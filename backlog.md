@@ -159,7 +159,7 @@ Goal: Implement the Fastify server, loopback security boundaries, SSE event bus,
   - Fastify SSE endpoint `/events?project=` streaming typed JSON payloads.
   - Acceptance Criteria: Client connected to SSE receives live patch events on file changes.
 
-- [ ] **SPRINT-4.4: Model Context Protocol (MCP) Tools**
+- [x] **SPRINT-4.4: Model Context Protocol (MCP) Tools**
   - Implement official MCP SDK server exposing:
     - `get_overview`: Compact repo card (~300 tokens).
     - `get_folder(path)` / `get_file(path)`: Cards with staleness status and delta.

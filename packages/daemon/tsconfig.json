@@ -6,6 +6,7 @@
   },
   "references": [
     { "path": "../schema" },
+    { "path": "../fixtures" },
     { "path": "../core" },
     { "path": "../extractors" }
   ],

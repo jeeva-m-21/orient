@@ -22,9 +22,11 @@
     "@orient/core": "workspace:*",
     "@orient/extractors": "workspace:*",
     "@orient/schema": "workspace:*",
-    "fastify": "^5.12.7"
+    "fastify": "^5.12.7",
+    "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@orient/fixtures": "workspace:*",
     "@types/node": "^22.10.1",
     "rimraf": "^6.0.1",
     "typescript": "^5.7.2"
