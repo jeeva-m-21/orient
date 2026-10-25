@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { execSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 import { CardSchema, type Card } from '@orient/schema';
 
 export function getCardSlug(cardPath: string): string {
@@ -113,52 +113,55 @@ export function syncCardsToGitRef(
   try {
     for (const file of entries) {
       const fullPath = path.join(cardsDir, file);
-      const blobSha = execSync(`git hash-object -w "${fullPath}"`, {
+      const blobSha = execFileSync('git', ['hash-object', '-w', fullPath], {
         cwd: repoRoot,
         env,
         encoding: 'utf8'
       }).trim();
 
-      execSync(`git update-index --add --cacheinfo 100644 ${blobSha} "cards/${file}"`, {
-        cwd: repoRoot,
-        env,
-        stdio: 'ignore'
-      });
+      execFileSync(
+        'git',
+        ['update-index', '--add', '--cacheinfo', '100644', blobSha, `cards/${file}`],
+        {
+          cwd: repoRoot,
+          env,
+          stdio: 'ignore'
+        }
+      );
     }
 
-    const treeSha = execSync('git write-tree', {
+    const treeSha = execFileSync('git', ['write-tree'], {
       cwd: repoRoot,
       env,
       encoding: 'utf8'
     }).trim();
 
     // Check if ref already exists for parent link
-    let parentArg = '';
+    let currentRef = '';
     try {
-      const currentRef = execSync(`git rev-parse --verify ${refName}`, {
+      currentRef = execFileSync('git', ['rev-parse', '--verify', refName], {
         cwd: repoRoot,
         env,
         encoding: 'utf8',
         stdio: ['pipe', 'pipe', 'ignore']
       }).trim();
-      if (currentRef) {
-        parentArg = `-p ${currentRef}`;
-      }
     } catch {
       // First commit on this ref
     }
 
-    const commitCmd = parentArg
-      ? `git commit-tree ${treeSha} ${parentArg} -m "orient: sync cards"`
-      : `git commit-tree ${treeSha} -m "orient: sync cards"`;
+    const commitArgs = ['commit-tree', treeSha];
+    if (currentRef) {
+      commitArgs.push('-p', currentRef);
+    }
+    commitArgs.push('-m', 'orient: sync cards');
 
-    const commitSha = execSync(commitCmd, {
+    const commitSha = execFileSync('git', commitArgs, {
       cwd: repoRoot,
       env,
       encoding: 'utf8'
     }).trim();
 
-    execSync(`git update-ref ${refName} ${commitSha}`, {
+    execFileSync('git', ['update-ref', refName, commitSha], {
       cwd: repoRoot,
       env,
       stdio: 'ignore'
@@ -179,7 +182,7 @@ export function loadCardsFromGitRef(
   const cards: Card[] = [];
 
   try {
-    const lsOutput = execSync(`git ls-tree -r "${refName}:cards"`, {
+    const lsOutput = execFileSync('git', ['ls-tree', '-r', `${refName}:cards`], {
       cwd: repoRoot,
       encoding: 'utf8',
       stdio: ['pipe', 'pipe', 'ignore']
@@ -192,7 +195,7 @@ export function loadCardsFromGitRef(
       const match = /^[0-9]+\s+blob\s+([a-f0-9]+)\t(.+)$/.exec(line);
       if (match) {
         const blobSha = match[1]!;
-        const rawJson = execSync(`git cat-file -p ${blobSha}`, {
+        const rawJson = execFileSync('git', ['cat-file', '-p', blobSha], {
           cwd: repoRoot,
           encoding: 'utf8'
         });

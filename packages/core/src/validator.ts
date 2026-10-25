@@ -61,12 +61,11 @@ export function validateAgentReport(
     }
 
     // 2. Safe path / traversal check
-    try {
-      validateSafePath(context.repoRoot, normPath);
-    } catch {
+    const safeResult = validateSafePath(context.repoRoot, normPath);
+    if (!safeResult.safe) {
       rejectedItems.push({
         path: item.path,
-        reason: `Path escapes workspace boundary: ${item.path}`
+        reason: safeResult.error || `Path escapes workspace boundary: ${item.path}`
       });
       continue;
     }

@@ -105,6 +105,29 @@ describe('Hard Gate Claims Validator (SPRINT-3.3)', () => {
     expect(outcome.result.rejectedItems[0]?.reason).toContain('restricted secret');
   });
 
+  it('rejects path traversal attempts escaping workspace boundary', () => {
+    const traversalReport: Report = {
+      ...validReport,
+      items: [
+        {
+          path: '../../etc/passwd',
+          kind: 'created',
+          role: 'config',
+          why: 'System passwd file'
+        }
+      ]
+    };
+
+    const outcome = validateAgentReport(traversalReport, {
+      repoRoot: '/fake/repo',
+      knownFiles: new Set(['../../etc/passwd']),
+      fileFactsMap
+    });
+
+    expect(outcome.result.accepted).toBe(false);
+    expect(outcome.result.rejectedItems[0]?.reason).toContain('escapes repository boundary');
+  });
+
   it('blocks overwriting human-pinned cards', () => {
     const pinnedCard: Card = {
       ...nextjsGoldenCard,
