@@ -129,7 +129,7 @@ Goal: Implement rebuildable SQLite caching, durable `.project/cards/` JSON stora
   - Implement 3-way disjoint slot merge (concurrent non-conflicting field updates merge cleanly; conflicting fields return error).
   - Acceptance Criteria: Simulated concurrent writes from two agents merge non-overlapping fields and reject conflicting ones with status `conflict`.
 
-- [ ] **SPRINT-3.5: Audit Logger & Forensics (`~/.config/orient/audit.log`)**
+- [x] **SPRINT-3.5: Audit Logger & Forensics (`~/.config/orient/audit.log`)**
   - Implement Layer 4 append-only structured audit logger.
   - Record timestamp, agent identity, session ID, tool call, validation outcome, and rejected reasons.
   - Redact sensitive snippets and tokens.

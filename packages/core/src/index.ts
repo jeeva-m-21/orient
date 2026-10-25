@@ -9,3 +9,4 @@ export * from './db.js';
 export * from './durableCards.js';
 export * from './validator.js';
 export * from './concurrency.js';
+export * from './auditLogger.js';
