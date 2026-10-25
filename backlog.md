@@ -189,7 +189,7 @@ Goal: Provide cold-start agent bootstrapping, deterministic brief fallback gener
   - Generate copyable bootstrap prompt instructing developer's active agent to inspect top-level folders and write cards into `.project/cards/*.json`.
   - Acceptance Criteria: Generated prompt adheres to `@orient/schema` and produces cards that pass hard gate validation.
 
-- [ ] **SPRINT-5.2: Fallback LLM Generator & Critic Pass**
+- [x] **SPRINT-5.2: Fallback LLM Generator & Critic Pass**
   - Construct compact deterministic brief (AST summary, exports, imports, diffs—never full source code).
   - Connect to local Ollama (`http://127.0.0.1:11434`) or user API key.
   - Implement critic pass to prune any generated claim unsupported by the AST brief.
