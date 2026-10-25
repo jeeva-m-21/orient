@@ -318,7 +318,7 @@ Goal: Build agent config installers (`orient init`), execute Playwright end-to-e
   - Enforce CI performance gates: first tree render $< 1.0\text{ s}$, full derived facts scan $< 45\text{ s}$, memory $< 120\text{ MB}$.
   - Acceptance Criteria: Performance benchmark passes with zero budget regressions.
 
-- [ ] **SPRINT-8.4: Production Packaging & CLI Verification (`npm pack`)**
+- [x] **SPRINT-8.4: Production Packaging & CLI Verification (`npm pack`)**
   - Bundle SPA assets into daemon public directory; bundle vendored WASM grammars.
   - Verify `npx orient` runs standalone without global npm installation.
   - Verify `orient doctor` passes all environment and permission checks.

@@ -135,6 +135,9 @@ export async function startDaemon(config: DaemonConfig = {}): Promise<DaemonInst
         return reply;
       }
 
+      // Exclude SPA static assets from bearer token check so browser can load index.html & assets
+      if (request.url === '/' || request.url.startsWith('/assets/')) return;
+
       // Bearer token authentication (Header or URL query token for EventSource)
       let reqToken: string | undefined;
       const authHeader = request.headers.authorization;
@@ -211,6 +214,41 @@ export async function startDaemon(config: DaemonConfig = {}): Promise<DaemonInst
       request.raw.on('close', () => {
         unsubscribe();
       });
+    });
+
+    // 6. SPA Static Assets Route
+    app.get('/', async (_request: FastifyRequest, reply: FastifyReply) => {
+      const publicPaths = [
+        path.join(process.cwd(), 'packages', 'web', 'dist', 'index.html'),
+        path.join(import.meta.dirname, '..', '..', 'web', 'dist', 'index.html')
+      ];
+      for (const p of publicPaths) {
+        if (fs.existsSync(p)) {
+          const html = fs.readFileSync(p, 'utf8');
+          reply.type('text/html').send(html);
+          return reply;
+        }
+      }
+      reply.type('text/html').send('<!DOCTYPE html><html><body><h1>Orient Daemon Active</h1></body></html>');
+      return reply;
+    });
+
+    app.get('/assets/*', async (request: FastifyRequest, reply: FastifyReply) => {
+      const assetPath = (request.params as { '*': string })['*'];
+      const candidatePaths = [
+        path.join(process.cwd(), 'packages', 'web', 'dist', 'assets', assetPath),
+        path.join(import.meta.dirname, '..', '..', 'web', 'dist', 'assets', assetPath)
+      ];
+      for (const p of candidatePaths) {
+        if (fs.existsSync(p)) {
+          const ext = path.extname(p);
+          const mime = ext === '.js' ? 'application/javascript' : ext === '.css' ? 'text/css' : 'application/octet-stream';
+          reply.type(mime).send(fs.readFileSync(p));
+          return reply;
+        }
+      }
+      reply.status(404).send({ error: 'Asset not found' });
+      return reply;
     });
 
     try {
