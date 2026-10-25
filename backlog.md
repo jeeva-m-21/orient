@@ -305,7 +305,7 @@ Goal: Build agent config installers (`orient init`), execute Playwright end-to-e
   - `orient remove` cleanly reverts all modified files using manifest.
   - Acceptance Criteria: `orient init` correctly configures agent MCP; `orient remove` restores files to bit-for-bit original state.
 
-- [ ] **SPRINT-8.2: End-to-End Persona Journey Testing with Playwright**
+- [x] **SPRINT-8.2: End-to-End Persona Journey Testing with Playwright**
   - Implement automated E2E tests validating usability pass criteria:
     - Meera Journey: Agent finishes task → open Inbox → review delta in $< 90\text{ s}$.
     - Arjun Journey: Onboarding student → Start Here path → locate login route in $< 2\text{ min}$.
