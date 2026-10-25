@@ -1,0 +1,27 @@
+{
+  "name": "@orient/cli",
+  "version": "0.1.0",
+  "type": "module",
+  "bin": {
+    "orient": "./dist/bin.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc --noEmit",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {
+    "@orient/core": "workspace:*",
+    "@orient/daemon": "workspace:*",
+    "@orient/schema": "workspace:*",
+    "commander": "^13.1.0"
+  },
+  "devDependencies": {
+    "@orient/fixtures": "workspace:*",
+    "@types/node": "^22.10.1",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.7.2"
+  }
+}

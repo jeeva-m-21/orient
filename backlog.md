@@ -169,7 +169,7 @@ Goal: Implement the Fastify server, loopback security boundaries, SSE event bus,
     - `report(report)`: Agent writeback pipeline with hard gate validation.
   - Acceptance Criteria: Mock agent connects via stdio, queries overview, and successfully submits reports.
 
-- [ ] **SPRINT-4.5: CLI Commands & MCP Stdio Shim (`orient`)**
+- [x] **SPRINT-4.5: CLI Commands & MCP Stdio Shim (`orient`)**
   - Implement CLI subcommands: `open`, `status`, `stop`, `doctor`, `export`, and `mcp`.
   - `mcp` stdio shim ensures daemon is alive and proxies MCP messages over local IPC/HTTP.
   - `doctor` reports git status, node version, port, permissions, and agent hooks health.
