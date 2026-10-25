@@ -87,7 +87,7 @@ Goal: Build resilient Tree-sitter WASM parsers for TypeScript, JavaScript, and P
   - Extract environment variable accesses (`process.env.XYZ`) and ports.
   - Acceptance Criteria: 100% accurate extraction against Next.js test fixture files.
 
-- [ ] **SPRINT-2.3: Python Language Extractor**
+- [x] **SPRINT-2.3: Python Language Extractor**
   - Implement Tree-sitter queries for Python imports (`import x`, `from x import y`) and functions/classes.
   - Implement route extractors for FastAPI (`@app.get`, `@router.post`) and Flask.
   - Extract environment variable accesses (`os.getenv`, `os.environ`) and ports.
