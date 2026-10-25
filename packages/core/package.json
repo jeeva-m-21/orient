@@ -18,10 +18,12 @@
   },
   "dependencies": {
     "@orient/schema": "workspace:*",
+    "better-sqlite3": "^13.0.3",
     "chokidar": "^4.0.3"
   },
   "devDependencies": {
     "@orient/fixtures": "workspace:*",
+    "@types/better-sqlite3": "^9.6.0",
     "rimraf": "^6.0.1",
     "typescript": "^5.7.2"
   }

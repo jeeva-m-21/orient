@@ -105,7 +105,7 @@ Goal: Build resilient Tree-sitter WASM parsers for TypeScript, JavaScript, and P
 
 Goal: Implement rebuildable SQLite caching, durable `.project/cards/` JSON storage, OCC concurrency controls, and hard-gate claim verification.
 
-- [ ] **SPRINT-3.1: SQLite Database Engine & Cache Self-Healing**
+- [x] **SPRINT-3.1: SQLite Database Engine & Cache Self-Healing**
   - Initialize SQLite (`better-sqlite3`) with WAL mode, `PRAGMA busy_timeout = 5000;`, and memory-mapped IO.
   - Define schema: projects, files, cards, card_versions, reviews, change_events, sessions, import_edges.
   - Implement auto-rebuild: if DB is deleted or corrupt, automatically rescan git and rebuild cache from durable cards.
