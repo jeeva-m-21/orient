@@ -117,7 +117,7 @@ Goal: Implement rebuildable SQLite caching, durable `.project/cards/` JSON stora
   - Implement optional git-ref mirror (`refs/orient/cards`).
   - Acceptance Criteria: Cards serialize to formatted JSON without merge conflicts; git ignore rules respected.
 
-- [ ] **SPRINT-3.3: Hard Gate Claims Validator**
+- [x] **SPRINT-3.3: Hard Gate Claims Validator**
   - Cross-check all claims in authored fields against parsed AST index: referenced paths, routes, exports, and files must exist.
   - Reject hallucinated paths; downgrade unverifiable claims to `confidence: low`.
   - Check role against fixed 23-item vocabulary.
