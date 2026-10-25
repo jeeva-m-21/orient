@@ -75,7 +75,7 @@ Goal: Deliver high-performance git tree scanning, multi-tier hashing (`blob`, `n
 
 Goal: Build resilient Tree-sitter WASM parsers for TypeScript, JavaScript, and Python with priority worker pool scheduling.
 
-- [ ] **SPRINT-2.1: Tree-Sitter WASM Harness & Priority Worker Pool**
+- [x] **SPRINT-2.1: Tree-Sitter WASM Harness & Priority Worker Pool**
   - Initialize Tree-sitter WASM runtime with worker threads (`worker_threads`).
   - Implement 4-tier priority task queue: P0 (UI active file), P1 (entry points/routes), P2 (watcher edits), P3 (background index).
   - Bounded concurrency to `os.availableParallelism() - 1` (max 4).

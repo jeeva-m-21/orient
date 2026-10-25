@@ -4,10 +4,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "pnpm --recursive --filter \"./packages/*\" run build",
-    "typecheck": "pnpm --recursive --filter \"./packages/*\" run typecheck",
+    "build": "tsc -b",
+    "typecheck": "tsc -b --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:core": "vitest run packages/core",
+    "test:extractors": "vitest run packages/extractors",
+    "test:schema": "vitest run packages/schema",
     "lint": "eslint .",
     "clean": "pnpm --recursive --filter \"./packages/*\" run clean"
   },
