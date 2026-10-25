@@ -47,7 +47,7 @@ Goal: Deliver high-performance git tree scanning, multi-tier hashing (`blob`, `n
   - Implement noise classification filter collapsing build dirs (`node_modules`, `dist`, `.next`, `target`, `__pycache__`, `venv`, lockfiles) into single metadata entries.
   - Acceptance Criteria: Scanner returns structured file nodes for a 10,000-file repository in $< 1.0\text{ s}$.
 
-- [ ] **SPRINT-1.2: Multi-Tier Hashing Engine**
+- [x] **SPRINT-1.2: Multi-Tier Hashing Engine**
   - Implement `blob` hash computation via git object hashing.
   - Implement AST `normalized` hash (stripping trivia, whitespace, and comments).
   - Implement `interface` hash (exports, signatures, routes, imports).
