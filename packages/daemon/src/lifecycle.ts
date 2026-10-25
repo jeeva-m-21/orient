@@ -4,7 +4,7 @@ import os from 'node:os';
 import crypto from 'node:crypto';
 import fastify, { type FastifyInstance, type FastifyRequest, type FastifyReply } from 'fastify';
 import cors from '@fastify/cors';
-import { validateSafePath } from '@orient/schema';
+import { validateSafePath, isBlacklistedPath } from '@orient/schema';
 import { EventBus } from './eventBus.js';
 
 export interface DaemonConfig {
@@ -174,6 +174,11 @@ export async function startDaemon(config: DaemonConfig = {}): Promise<DaemonInst
       const safeResult = validateSafePath(repoRoot, query.path);
       if (!safeResult.safe) {
         reply.status(403).send({ error: safeResult.error || 'Path escapes repository boundary' });
+        return reply;
+      }
+
+      if (isBlacklistedPath(safeResult.normalizedPath)) {
+        reply.status(403).send({ error: 'Access to sensitive file is prohibited' });
         return reply;
       }
 

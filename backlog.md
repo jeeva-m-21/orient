@@ -175,7 +175,7 @@ Goal: Implement the Fastify server, loopback security boundaries, SSE event bus,
   - `doctor` reports git status, node version, port, permissions, and agent hooks health.
   - Acceptance Criteria: `orient status` reports daemon PID; `orient doctor` outputs clean diagnostics.
 
-- [ ] **SPRINT-4.6: Security Fuzzing with FFUF**
+- [x] **SPRINT-4.6: Security Fuzzing with FFUF**
   - Run `ffuf-web-fuzzing` against daemon endpoints to test path traversal, malformed JSON, auth bypass, and header fuzzing.
   - Acceptance Criteria: Zero unhandled crashes; 100% of fuzzed malicious requests safely rejected.
 
