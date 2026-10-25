@@ -14,7 +14,7 @@ Goal: Establish the repository infrastructure, strict TypeScript configurations,
   - Setup scripts: `build`, `test`, `typecheck`, `lint`, `clean`.
   - Acceptance Criteria: `pnpm run typecheck` and `pnpm test` execute cleanly across all packages.
 
-- [ ] **SPRINT-0.2: Core Card & Anchor Zod Schemas (`@orient/schema`)**
+- [x] **SPRINT-0.2: Core Card & Anchor Zod Schemas (`@orient/schema`)**
   - Define `Role`, `CardLevel`, `StalenessState`, and `Source` enums.
   - Implement Zod schema for `Card`: derived fields (fileCount, loc, keyFiles, dependsOn, usedBy, surface, tests, health) and authored fields (purpose, role, why, oneThing, conventions, doNot, decisions, representativeFile).
   - Implement `Anchor` schema (commit, blob, tree, normalized, interface, structure).
