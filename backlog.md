@@ -42,7 +42,7 @@ Goal: Establish the repository infrastructure, strict TypeScript configurations,
 
 Goal: Deliver high-performance git tree scanning, multi-tier hashing (`blob`, `normalized`, `interface`, `structure`, `tree`), card staleness evaluation, and watcher storm suppression.
 
-- [ ] **SPRINT-1.1: Fast Git Tree Scanner & Noise Classifier**
+- [x] **SPRINT-1.1: Fast Git Tree Scanner & Noise Classifier**
   - Implement scanner executing `git ls-files -s` and untracked non-ignored file enumeration.
   - Implement noise classification filter collapsing build dirs (`node_modules`, `dist`, `.next`, `target`, `__pycache__`, `venv`, lockfiles) into single metadata entries.
   - Acceptance Criteria: Scanner returns structured file nodes for a 10,000-file repository in $< 1.0\text{ s}$.
