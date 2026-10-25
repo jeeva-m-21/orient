@@ -1,0 +1,19 @@
+{
+  "name": "orient-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "pnpm --recursive --filter \"./packages/*\" run build",
+    "typecheck": "pnpm --recursive --filter \"./packages/*\" run typecheck",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint packages/*/src --ext .ts,.tsx",
+    "clean": "pnpm --recursive --filter \"./packages/*\" run clean"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}

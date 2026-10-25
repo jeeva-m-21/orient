@@ -9,7 +9,7 @@
 
 Goal: Establish the repository infrastructure, strict TypeScript configurations, testing harnesses, `@orient/schema` Zod data models, and multi-stack golden test fixtures.
 
-- [ ] **SPRINT-0.1: Monorepo Tooling & Workspace Setup**
+- [x] **SPRINT-0.1: Monorepo Tooling & Workspace Setup**
   - Configure root `package.json`, pnpm workspaces, TypeScript strict `tsconfig.base.json`, Vitest, ESLint, and Prettier.
   - Setup scripts: `build`, `test`, `typecheck`, `lint`, `clean`.
   - Acceptance Criteria: `pnpm run typecheck` and `pnpm test` execute cleanly across all packages.
