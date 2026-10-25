@@ -177,6 +177,36 @@ export function extractTypeScriptFacts(content: string, filePath: string): Extra
   // 5. Exports
   const exportsList: ExtractedSymbol[] = [];
 
+  // Re-exports (e.g. export * from './foo.js' or export { a, b as c } from './bar.js')
+  // These count as both dependencies (imports) and exported symbols
+  const reExportRegex = /export\s+(?:type\s+)?(?:\*\s*(?:as\s+([a-zA-Z0-9_$]+))?|\{([^}]*)\})\s+from\s+['"]([^'"]+)['"]/g;
+  let reExpMatch: RegExpExecArray | null;
+  while ((reExpMatch = reExportRegex.exec(content)) !== null) {
+    const starAlias = reExpMatch[1];
+    const namedSpecs = reExpMatch[2];
+    const source = reExpMatch[3];
+    if (!source) continue;
+
+    const specs: string[] = [];
+    if (starAlias) {
+      specs.push(starAlias.trim());
+      exportsList.push({ name: starAlias.trim(), kind: 'variable' });
+    }
+    if (namedSpecs) {
+      namedSpecs
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean)
+        .forEach((s) => {
+          const parts = s.split(/\s+as\s+/);
+          const exportName = (parts[1] || parts[0])!.trim();
+          specs.push(exportName);
+          exportsList.push({ name: exportName, kind: 'variable' });
+        });
+    }
+    registerImport(source, specs, false);
+  }
+
   // Functions
   const funcExportRegex = /export\s+(?:async\s+)?function\s+([a-zA-Z0-9_$]+)/g;
   let expMatch: RegExpExecArray | null;

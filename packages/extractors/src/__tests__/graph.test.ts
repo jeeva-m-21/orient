@@ -40,6 +40,11 @@ describe('Dependency Graph Resolution & Centrality Ranker (SPRINT-2.4)', () => {
       expect(resolvedModel).toBe('app/models.py');
     });
 
+    it('resolves Next.js and workspace path aliases with @/ prefix', () => {
+      const resolvedAuth = resolveImportPath('app/api/auth/route.ts', '@/auth/jwt', knownFiles);
+      expect(resolvedAuth).toBe('src/auth/jwt.ts');
+    });
+
     it('returns null for external third-party package dependencies', () => {
       expect(resolveImportPath('src/server.ts', 'express', knownFiles)).toBeNull();
       expect(resolveImportPath('src/server.ts', 'vitest', knownFiles)).toBeNull();

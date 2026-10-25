@@ -30,6 +30,24 @@ describe('TypeScript/JavaScript Language Extractor (SPRINT-2.2)', () => {
     expect(dbImport?.isDynamic).toBe(true);
   });
 
+  it('extracts re-exports from barrel files as both dependencies and exports', () => {
+    const code = `
+      export * from './card.js';
+      export { signToken, verifyToken as verify } from './jwt.js';
+      export const VERSION = '1.0.0';
+    `;
+
+    const facts = extractTypeScriptFacts(code, 'src/index.ts');
+    const sources = facts.imports.map((i) => i.source);
+    expect(sources).toContain('./card.js');
+    expect(sources).toContain('./jwt.js');
+
+    const exports = facts.exports.map((e) => e.name);
+    expect(exports).toContain('signToken');
+    expect(exports).toContain('verify');
+    expect(exports).toContain('VERSION');
+  });
+
   it('extracts named and default exports for functions, classes, consts, types', () => {
     const code = `
       export function verifyAuthSession(token: string) { return true; }

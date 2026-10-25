@@ -91,6 +91,26 @@ export function resolveImportPath(
     }
   }
 
+  // 4. Next.js / tsconfig path aliases (@/ or ~/)
+  if (importSpecifier.startsWith('@/') || importSpecifier.startsWith('~/')) {
+    const aliasPath = importSpecifier.slice(2);
+    const candidates = [
+      aliasPath,
+      path.posix.join('src', aliasPath),
+      path.posix.join('app', aliasPath)
+    ];
+
+    for (const c of candidates) {
+      if (knownSet.has(c)) return c;
+      for (const ext of ['.ts', '.tsx', '.js', '.jsx']) {
+        if (knownSet.has(`${c}${ext}`)) return `${c}${ext}`;
+      }
+      for (const idx of ['index.ts', 'index.tsx', 'index.js', 'index.jsx']) {
+        if (knownSet.has(path.posix.join(c, idx))) return path.posix.join(c, idx);
+      }
+    }
+  }
+
   return null;
 }
 
