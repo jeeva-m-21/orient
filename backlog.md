@@ -64,7 +64,7 @@ Goal: Deliver high-performance git tree scanning, multi-tier hashing (`blob`, `n
   - Design and run pairwise combinatorial tests using `pypict` for all permutations of file changes (byte change, AST change, export change, structure change, dependency change).
   - Acceptance Criteria: 100% pairwise coverage of state transitions validated against expected status.
 
-- [ ] **SPRINT-1.5: Adaptive Watcher & Watcher Storm Suppression**
+- [x] **SPRINT-1.5: Adaptive Watcher & Watcher Storm Suppression**
   - Implement file watcher with 200ms debounce.
   - Implement storm suppression: if events exceed $50$ files/200ms (branch switch, pull, checkout), suppress per-file parsing and execute a single snapshot diff via `git ls-files -s`.
   - Acceptance Criteria: Simulated 5,000-file git checkout triggers snapshot diff without saturating event loop.
