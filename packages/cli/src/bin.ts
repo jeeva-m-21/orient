@@ -2,7 +2,7 @@
 import { Command } from 'commander';
 import { getStatus, stopDaemon, runDoctor, runCiCheck } from './commands.js';
 import { applyAgentConfigs, removeAgentConfigs, detectAgents, type SupportedAgent } from './adapters.js';
-import { createOrientMcpServer } from '@orient/daemon';
+import { createOrientMcpServer, startDaemon } from '@orient/daemon';
 import { openDatabase, initDatabase } from '@orient/core';
 import path from 'node:path';
 import os from 'node:os';
@@ -12,6 +12,39 @@ program
   .name('orient')
   .description('Local-first verified project map for humans & agents')
   .version('0.1.0');
+
+program
+  .command('open')
+  .alias('start')
+  .description('Start the Orient daemon and serve the web UI')
+  .option('-p, --port <port>', 'Port to bind', '4477')
+  .action(async (cmdOptions) => {
+    const port = parseInt(cmdOptions.port, 10) || 4477;
+    const configDir = path.join(os.homedir(), '.config', 'orient');
+    const daemon = await startDaemon({
+      port,
+      host: '127.0.0.1',
+      configDir,
+      repoRoot: process.cwd()
+    });
+    console.log(`✓ Orient daemon started on http://127.0.0.1:${daemon.port} (PID: ${process.pid})`);
+    console.log(`  Auth token: ${daemon.token}`);
+    console.log(`  Web application: http://127.0.0.1:${daemon.port}/`);
+    
+    // Graceful shutdown listeners
+    process.on('SIGINT', async () => {
+      console.log('\nStopping Orient daemon...');
+      await daemon.stop();
+      process.exit(0);
+    });
+    process.on('SIGTERM', async () => {
+      await daemon.stop();
+      process.exit(0);
+    });
+
+    // Keep process running
+    await new Promise(() => {});
+  });
 
 program
   .command('status')
