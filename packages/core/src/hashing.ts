@@ -88,3 +88,12 @@ export function computeStructureHash(entries: StructureEntry[]): string {
   const serialized = sorted.map((e) => `${e.kind}:${e.name}`).join('\n');
   return createHash('sha1').update(serialized, 'utf8').digest('hex');
 }
+
+/**
+ * Computes an aggregated interface hash for a folder by sorting child file paths and their hashes.
+ */
+export function computeFolderInterfaceHash(childFileHashes: Map<string, string>): string {
+  const sorted = [...childFileHashes.entries()].sort(([a], [b]) => a.localeCompare(b));
+  const serialized = sorted.map(([p, h]) => `${p}:${h}`).join('\n');
+  return createHash('sha1').update(serialized, 'utf8').digest('hex');
+}

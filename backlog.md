@@ -313,7 +313,7 @@ Goal: Build agent config installers (`orient init`), execute Playwright end-to-e
     - Priya Journey: Senior lead audit → Overview findings → locate fragile/untested modules.
   - Acceptance Criteria: All 4 persona E2E journey tests pass green in CI.
 
-- [ ] **SPRINT-8.3: Scalability & Performance Benchmark Verification**
+- [x] **SPRINT-8.3: Scalability & Performance Benchmark Verification**
   - Generate synthetic 10,000-file and 50,000-file repositories.
   - Enforce CI performance gates: first tree render $< 1.0\text{ s}$, full derived facts scan $< 45\text{ s}$, memory $< 120\text{ MB}$.
   - Acceptance Criteria: Performance benchmark passes with zero budget regressions.
