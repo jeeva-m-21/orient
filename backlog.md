@@ -54,7 +54,7 @@ Goal: Deliver high-performance git tree scanning, multi-tier hashing (`blob`, `n
   - Implement folder `structure` hash (sorted child names + types).
   - Acceptance Criteria: Property tests verify code reformatting/whitespace changes alter `blob` hash while preserving `normalized` and `interface` hashes.
 
-- [ ] **SPRINT-1.3: Card Staleness State Machine**
+- [x] **SPRINT-1.3: Card Staleness State Machine**
   - Implement transition evaluator: `Unknown` → `Fresh` → `Drifted` → `Outdated` → `Affected`.
   - Implement 1-hop reverse dependency invalidation (`Affected` state).
   - Calculate delta summary (`+N exports, -M exports`) when transitioning to `Outdated`.
