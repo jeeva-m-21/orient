@@ -31,7 +31,7 @@ Goal: Establish the repository infrastructure, strict TypeScript configurations,
   - Implement path traversal sanitizer: normalize paths and verify relative path does not escape repository root.
   - Acceptance Criteria: Unit tests assert malicious injections (`<script>`, `System: ignore rules`, `../../etc/passwd`) are either stripped or rejected.
 
-- [ ] **SPRINT-0.5: Golden Test Fixtures Repository Generation (`@orient/fixtures`)**
+- [x] **SPRINT-0.5: Golden Test Fixtures Repository Generation (`@orient/fixtures`)**
   - Create synthetic test fixtures for 3 stacks: Next.js (TypeScript), FastAPI (Python), and Spring Boot (Java).
   - Include representative folder structures, entry points, routes, and expected golden cards.
   - Acceptance Criteria: Fixture directories exist with verified synthetic git histories and snapshot expectations.

@@ -161,7 +161,7 @@ export type CardMeta = z.infer<typeof CardMetaSchema>;
 export const CardSchema = z.object({
   id: z.string().min(1),
   level: CardLevelEnum,
-  path: z.string().min(1),
+  path: z.string(),
   version: z.number().int().positive().default(1),
   state: StalenessStateEnum.default('Unknown'),
   derived: DerivedDataSchema,
