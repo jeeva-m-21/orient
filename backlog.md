@@ -20,7 +20,7 @@ Goal: Establish the repository infrastructure, strict TypeScript configurations,
   - Implement `Anchor` schema (commit, blob, tree, normalized, interface, structure).
   - Acceptance Criteria: Unit tests pass verifying valid cards parse successfully and invalid structures fail with actionable Zod errors.
 
-- [ ] **SPRINT-0.3: Agent Reports, Events & API Contract Schemas (`@orient/schema`)**
+- [x] **SPRINT-0.3: Agent Reports, Events & API Contract Schemas (`@orient/schema`)**
   - Define `Report` and `ReportItem` schemas for agent writeback.
   - Define SSE event payload schemas (`scan.progress`, `tree.patch`, `card.updated`, `status.changed`, `agent.state`, `inbox.updated`).
   - Define REST API request/response schemas for `/api/projects`, `/api/p/:id/tree`, `/api/p/:id/card`, `/api/p/:id/inbox`, and `/api/p/:id/review`.
