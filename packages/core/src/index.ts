@@ -12,3 +12,4 @@ export * from './concurrency.js';
 export * from './auditLogger.js';
 export * from './bootstrap.js';
 export * from './generator.js';
+export * from './search.js';

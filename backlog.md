@@ -195,7 +195,7 @@ Goal: Provide cold-start agent bootstrapping, deterministic brief fallback gener
   - Implement critic pass to prune any generated claim unsupported by the AST brief.
   - Acceptance Criteria: Generator produces valid card JSON; critic pass strips ungrounded hallucinations.
 
-- [ ] **SPRINT-5.3: BM25 Lexical Task Search**
+- [x] **SPRINT-5.3: BM25 Lexical Task Search**
   - Implement SQLite Full-Text Search (FTS5) over card `purpose`, `role`, `keyFiles`, routes, exports, and env vars.
   - Expand retrieval along 1-hop import edges.
   - Return ranked files, conventions, and affected touchpoints in $< 100\text{ ms}$.
