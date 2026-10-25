@@ -12,6 +12,7 @@
     "test:extractors": "vitest run packages/extractors",
     "test:daemon": "vitest run packages/daemon",
     "test:cli": "vitest run packages/cli",
+    "test:web": "vitest run packages/web",
     "test:schema": "vitest run packages/schema",
     "lint": "eslint .",
     "clean": "pnpm --recursive --filter \"./packages/*\" run clean"

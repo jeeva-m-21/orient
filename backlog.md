@@ -213,7 +213,7 @@ Goal: Provide cold-start agent bootstrapping, deterministic brief fallback gener
 
 Goal: Build the calm, accessible, keyboard-driven web interface with virtualized tree, 10-slot Card panel, code drawer, and command palette.
 
-- [ ] **SPRINT-6.1: Web App Foundation & Design Token System**
+- [x] **SPRINT-6.1: Web App Foundation & Design Token System**
   - Setup Vite + React + Tailwind + Radix UI primitives.
   - Implement CSS variables design tokens for light and dark themes (default dark) with strict WCAG AA contrast.
   - Establish semantic color isolation (status colors separate from agent identity colors).

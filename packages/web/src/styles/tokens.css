@@ -1,0 +1,96 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root,
+:root[data-theme="dark"] {
+  /* Dark theme is the default */
+  --bg: #0e1116;
+  --surface: #151a21;
+  --surface-2: #1b222b;
+  --border: #262e38;
+  --text: #e6eaf0;
+  --text-muted: #9aa4b2;
+  --text-faint: #6b7684;
+
+  --accent: #6b9bf2;
+  --accent-soft: #1a2a47;
+
+  /* Status Tokens (Dark) */
+  --status-fresh-fg: #5cc28f;
+  --status-fresh-bg: #16301f;
+  --status-drifted-fg: #d3c46a;
+  --status-drifted-bg: #2e2a12;
+  --status-outdated-fg: #e39a55;
+  --status-outdated-bg: #33210e;
+  --status-affected-fg: #a596e0;
+  --status-affected-bg: #221d38;
+  --status-unknown-fg: #8b95a3;
+  --status-unknown-bg: #1f252d;
+  --status-error-fg: #e8776a;
+  --status-error-bg: #361714;
+
+  /* Agent Identity Markers */
+  --agent-coral: #e07a5f;
+  --agent-green: #3d9970;
+  --agent-violet: #7b6cf6;
+  --agent-amber: #e9a23b;
+  --agent-cyan: #2ba6c9;
+  --agent-magenta: #c45b9e;
+
+  /* Typography & Motion */
+  --font-ui: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-code: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+
+  --dur-fast: 120ms;
+  --dur: 180ms;
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+}
+
+:root[data-theme="light"] {
+  --bg: #fafaf9;
+  --surface: #ffffff;
+  --surface-2: #f3f4f2;
+  --border: #e4e6e3;
+  --text: #1b1f24;
+  --text-muted: #5b636d;
+  --text-faint: #8a929c;
+
+  --accent: #3b6fd4;
+  --accent-soft: #e8effc;
+
+  /* Status Tokens (Light) */
+  --status-fresh-fg: #2f7d57;
+  --status-fresh-bg: #e6f3ec;
+  --status-drifted-fg: #8a7a2b;
+  --status-drifted-bg: #f6f1d9;
+  --status-outdated-fg: #b5651d;
+  --status-outdated-bg: #fbebd9;
+  --status-affected-fg: #6a5bb0;
+  --status-affected-bg: #ece8f7;
+  --status-unknown-fg: #6e7681;
+  --status-unknown-bg: #eef0f2;
+  --status-error-fg: #b3402f;
+  --status-error-bg: #fae5e1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
