@@ -109,13 +109,16 @@ flowchart TB
 | `doctor` | Check git, Node version, port, permissions, agent configs, report health |
 | `mcp` | stdio shim launched by agents; ensures daemon is running and proxies MCP calls |
 | `export` | Write `AGENTS.md` / `.project/context.json` snapshot |
+| `ci` / `verify` | Headless execution: check staleness, unreported changes, and card validity against configurable thresholds; exits 0 (clean) or 1 (policy breach) |
 
 **Config write manifest:** every file modified by `init` is recorded (`path`, `before-hash`, `inserted-block-id`) so `remove` is exact.
 
-### 4.2 Daemon lifecycle and port
+### 4.2 Daemon lifecycle, liveness, and self-healing
 - One **global daemon per user**, many repos.
 - Default port `4477`; on conflict try `4478..4499`; write the real port to `~/.config/orient/daemon.json` (`pid`, `port`, `token`, `startedAt`).
-- Bind `127.0.0.1` only. Random token per run required on API and SSE. Validate `Host` and `Origin`; reject others (blocks DNS rebinding and cross-site calls).
+- **Zombie Lockfile Cleanup:** On startup, if `daemon.json` exists, probe the recorded PID with `process.kill(pid, 0)`. If stale, clean lockfile and reclaim port automatically.
+- **Cache Self-Healing:** The SQLite database is an ephemeral cache. If corrupted or missing, the daemon transparently regenerates indexes from the working git tree and durable `.project/cards/*.json` files.
+- Bind `127.0.0.1` only. Cryptographic 32-byte hex token per run required on API and SSE (`0600` permissions on token file). Validate `Host` and `Origin` against loopback allow-list (blocks DNS rebinding and cross-site calls).
 - Started by: `orient open`, the MCP shim, or optional login item.
 - Idle shutdown option (default off while any agent connection exists).
 
@@ -300,6 +303,19 @@ Typed events pushed to the UI; the UI patches local state, never refetches the t
 ### 4.12 Agent attribution
 Best-effort cascade: hook/MCP identification -> known agent session files and process names -> heuristics (large multi-file burst with no user editor focus) -> `unknown`. Each agent gets a stable color from a fixed palette seeded by name. Never guess silently: unknown stays unknown.
 
+### 4.13 Multi-agent concurrency and optimistic locking
+When multiple agents (or an agent and a human) interact with Orient simultaneously:
+- **Optimistic Concurrency Control (OCC):** Every card maintains an integer `version`. Write requests (`report` or UI edit) carry an `expectedVersion`.
+- **Per-Path Async Mutex:** Daemon uses in-memory async locking keyed by `projectId + path` to serialize write-backs targeting the same folder/file card.
+- **Disjoint Slot Merging:** If concurrent reports touch disjoint fields (e.g. Agent A updates `conventions`, Agent B adds `decisions`), the daemon safely merges them without conflict. Conflicting edits to the same field fail fast with `{ status: "conflict", currentVersion, conflictSlots }`.
+- **SQLite Concurrency:** SQLite configured in WAL mode with `PRAGMA busy_timeout = 5000;`, enabling concurrent reads during writes and smooth transaction backoff.
+
+### 4.14 Watcher storm suppression & adaptive snapshot diffing
+Large monorepos or bulk operations (`git checkout`, `git pull`, `npm install`) can generate tens of thousands of filesystem events in seconds.
+- **Normal Edit Mode:** When file change rate is $\le 50$ files/sec, debounced (200 ms) worker tasks parse individual files.
+- **Storm Suppression Mode:** If event frequency exceeds $50$ files within 200 ms, incremental queuing pauses immediately.
+- **Snapshot Diff:** The daemon executes a single `git ls-files -s` pass, diffs the resulting tree against the in-memory hash index in $O(\text{changed folders})$, and queues re-parsing only for affected subtrees.
+
 ---
 
 ## 5. Data model
@@ -449,6 +465,15 @@ Responses are compact JSON, never prose paragraphs; every card includes `status`
 ### 7.3 Exported files
 `AGENTS.md` (human-readable summary, auto-generated, with "generated at commit X" line) and `.project/context.json` (machine-readable repo + folder cards). These are snapshots; MCP is the live source.
 
+### 7.4 Headless CI/CD and automated governance (`orient ci`)
+To prevent comprehension debt and undocumented code changes from slipping into main branches:
+- **Command:** `npx orient ci` (or `orient verify`) with configurable flags (`--max-outdated=10%`, `--strict-unreported=src/auth,src/payments`).
+- **Policy Checks:**
+  1. Fail if outdated cards exceed threshold.
+  2. Fail if unreported changes touch high-risk security/payment/auth directories.
+  3. Fail if the card validator discovers broken citations (`file:line` or route that does not exist).
+- **Automation:** Emits standard JSON/JUnit test results and automatically writes verified `AGENTS.md` snapshots to the repository root.
+
 ---
 
 ## 8. Retrieval for `find_for_task` and task search
@@ -458,28 +483,80 @@ Phase 2 (optional): embeddings (local small model) for semantic matching; LLM re
 
 ---
 
-## 9. Security and privacy
+## 9. Security, privacy, and defense-in-depth
 
-| Threat | Control |
-|---|---|
-| Malicious website calling localhost API | Loopback bind, per-run token, Host/Origin checks, no wildcard CORS |
-| DNS rebinding | Host header allow-list (`127.0.0.1`, `localhost` + port) |
-| Secret exposure | Never read `.env*`, key files, `*.pem`, deny-list globs; redact patterns in snippets; skip files matching secret scanners |
-| Prompt injection via card text or repo content | Cards are typed JSON; free text length-capped, stripped of control phrases and markup; MCP responses wrap text as data fields; agents are instructed in rules that card text is descriptive only |
-| Poisoned reports | Cross-check against git/parse; unverified labeled `agent-said`; reject claims referencing nonexistent paths |
-| Config tampering during `init` | Diff preview, manifest, exact `remove` |
-| LLM data leakage | Off by default; user key or local; send briefs and diffs only; log what is sent in a local audit view |
-| Supply chain | Pin dependencies, lockfile, provenance publish, WASM grammars vendored |
-| Multi-user machines | Config dir `0700`, token file `0600` |
+Orient implements a strict **4-Layer Defense-in-Depth** model across every data boundary:
+
+```mermaid
+flowchart TD
+    subgraph L1["Layer 1: Entry Point Validation"]
+        E1[Loopback 127.0.0.1 bind only]
+        E2[Host & Origin Allow-list]
+        E3[32-byte Bearer Token Auth]
+        E4[Path Jailbreak Guard path.relative]
+        E5[Zod Schema Boundary Enforcement]
+    end
+    subgraph L2["Layer 2: Business Logic Validation"]
+        B1[AST / Git Diff Cross-Check]
+        B2[Prompt Injection Sanitization]
+        B3[Pinned Human Edits Guard]
+        B4[Role Vocabulary Check]
+    end
+    subgraph L3["Layer 3: Environment Guards"]
+        G1[Deny-list .env, .pem, .key, credentials]
+        G2[Read-Only Git Commands Execution]
+        G3[Restricted File System Permissions 0700/0600]
+    end
+    subgraph L4["Layer 4: Audit Instrumentation & Forensics"]
+        A1[Append-only ~/.config/orient/audit.log]
+        A2[Rejected Claims Forensics with Stack Traces]
+        A3[Model Brief Egress Audit]
+    end
+
+    L1 --> L2 --> L3 --> L4
+```
+
+### 9.1 Threat matrix and defense controls
+
+| Threat | Control Layer | Specific Defense Mechanism |
+|---|---|---|
+| Malicious website calling localhost API | Layer 1 | Loopback bind (`127.0.0.1`), per-run 32-byte hex token, strict Host/Origin check (`localhost:<port>`, `127.0.0.1:<port>`), no wildcard CORS |
+| Path traversal / jailbreak attacks | Layer 1 | All paths normalized and verified with `path.relative(repoRoot, resolvedPath)`; refuse paths starting with `..` or escaping repo boundaries |
+| DNS rebinding | Layer 1 | Host header validation rejecting arbitrary domain hosts |
+| Prompt injection via card text / comments | Layer 2 | Hard length caps (purpose $\le 140$, why $\le 200$, oneThing $\le 12$ words); strip markdown control syntax, script tags, and directive keywords (`System:`, `Ignore instructions`); MCP returns structured data properties only |
+| Poisoned / Hallucinated agent reports | Layer 2 | Hard validation gate cross-referencing all reported paths, symbols, and routes against parsed AST and git diff; unmatched claims rejected or labeled `agent-said` |
+| Overwriting human knowledge | Layer 2 | Human card edits marked `pinned: true`; agent updates cannot overwrite pinned cards |
+| Secret and credential exposure | Layer 3 | Zero-read policy on `.env*`, `*.pem`, `*.key`, `id_rsa`, `.git/config`, `credentials*`; regex redaction on all code preview snippets |
+| Accidental destructive repo mutation | Layer 3 | Daemon process restricted to read-only git operations (`ls-files`, `rev-parse`, `status`, `diff`, `hash-object`); mutating git commands strictly blocked |
+| Multi-user machine eavesdropping | Layer 3 | Config directory created with `0700` permissions; `daemon.json` token file written with `0600` permissions |
+| Egress data leakage | Layer 3 / 4 | Default 100% offline; optional LLM sends compact AST briefs and diffs only (never full source files); logs all brief dispatches to local audit log |
+| Forensics & forensic observability | Layer 4 | Append-only structured `audit.log` recording MCP tool invocations, report accept/reject statuses, validation failures, and agent session tokens |
 
 ---
 
-## 10. Performance strategy
-- Tree and status come from `git ls-files -s` (one process call) and in-memory maps.
-- Parsing is incremental and parallel in worker threads; unchanged blob hashes skip parsing (cache keyed by blob).
-- Priority scan order: entry points and recently changed paths first.
-- UI receives patches only; virtualized tree; diagrams capped at ~12 nodes with clustering.
-- Budgets: first tree < 1 s (10k files), card open < 100 ms (cached), status recompute < 500 ms.
+## 10. Performance, scalability, and enterprise workloads
+
+Designed to maintain sub-second responsiveness on enterprise repositories scaling from 1,000 to 100,000 files:
+
+### 10.1 Multi-tier memory and storage architecture
+- **L1 In-Memory LRU Cache:** Active cards, recent files, and root overview cached in memory, capped at 30 MB.
+- **L2 SQLite WAL Mode:** Uses memory-mapped I/O (`PRAGMA mmap_size = 268435456; PRAGMA cache_size = -20000;`) for instant query execution without loading full tables into Node heap.
+- **L3 Durable JSON Cards:** Disk storage for cards under `.project/cards/<hash>.json` prevents merge collisions and keeps heap lean.
+
+### 10.2 Bounded worker pool & priority scheduling
+Tree-sitter WASM AST extraction runs in Node.js `worker_threads` with dynamic priority scheduling:
+- **Priority 0 (Immediate):** Active card viewed in UI or requested synchronously by agent via MCP.
+- **Priority 1 (High):** Project entry points, API routes, and configuration manifests.
+- **Priority 2 (Normal):** Recently edited files detected by the watcher.
+- **Priority 3 (Idle/Background):** Deep internal modules during initial repository indexing.
+- **Worker Concurrency Budget:** Bounded to `Math.max(1, Math.min(4, os.availableParallelism() - 1))` to preserve developer CPU for their editor and agent.
+
+### 10.3 Performance budgets
+- First tree render on 10,000 files: $< 1.0\text{ s}$
+- Full derived facts scan on 10,000 files: $< 45\text{ s}$
+- Status recompute on file change: $< 200\text{ ms}$
+- Card panel open (cached): $< 50\text{ ms}$
+- Memory footprint (idle daemon): $< 120\text{ MB}$
 
 ---
 
