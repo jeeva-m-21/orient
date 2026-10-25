@@ -60,7 +60,7 @@ Goal: Deliver high-performance git tree scanning, multi-tier hashing (`blob`, `n
   - Calculate delta summary (`+N exports, -M exports`) when transitioning to `Outdated`.
   - Acceptance Criteria: State machine unit tests cover all 10 state transitions; reverting code to described hash immediately restores `Fresh` status.
 
-- [ ] **SPRINT-1.4: Combinatorial State Testing with PICT**
+- [x] **SPRINT-1.4: Combinatorial State Testing with PICT**
   - Design and run pairwise combinatorial tests using `pypict` for all permutations of file changes (byte change, AST change, export change, structure change, dependency change).
   - Acceptance Criteria: 100% pairwise coverage of state transitions validated against expected status.
 
