@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { validateWordCount } from './security.js';
 
 export const RoleEnum = z.enum([
   'entrypoint',
@@ -125,7 +126,9 @@ export const AuthoredDataSchema = z.object({
   purpose: z.string().max(140),
   role: RoleEnum,
   why: z.string().max(200),
-  oneThing: z.string(),
+  oneThing: z.string().refine((val) => validateWordCount(val, 12), {
+    message: 'oneThing must be 12 words or fewer'
+  }),
   conventions: z.array(z.string().max(120)).max(5).default([]),
   doNot: z.array(z.string()).max(5).default([]),
   decisions: z.array(DecisionSchema).default([]),

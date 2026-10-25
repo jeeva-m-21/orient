@@ -1,0 +1,9 @@
+[project]
+name = "fixture-fastapi"
+version = "0.1.0"
+description = "FastAPI synthetic test fixture"
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn>=0.32.0",
+    "pydantic>=2.9.0"
+]

@@ -101,6 +101,47 @@ describe('Card & Anchor Schemas', () => {
     expect(parsed.version).toBe(1);
   });
 
+  it('rejects cards where oneThing exceeds 12 words', () => {
+    const invalidCard = {
+      id: 'proj1:src/wordy',
+      level: 'folder' as const,
+      path: 'src/wordy',
+      version: 1,
+      state: 'Fresh' as const,
+      derived: {
+        fileCount: 1,
+        loc: 10,
+        languages: ['ts'],
+        keyFiles: [],
+        dependsOn: [],
+        usedBy: [],
+        surface: { routes: [], exports: [], envVars: [], tables: [], ports: [] },
+        tests: { present: false, paths: [] },
+        health: { lastChanged: '2026-10-25', todoCount: 0, hasTests: false }
+      },
+      authored: {
+        purpose: 'Some purpose',
+        role: 'services' as const,
+        why: 'Why',
+        oneThing: 'This is an excessively wordy one thing statement that contains far more than twelve words total.',
+        conventions: [],
+        doNot: [],
+        decisions: []
+      },
+      meta: {
+        source: 'agent-reported' as const,
+        confidence: 'high' as const,
+        evidence: [],
+        anchor: { commit: 'abc' },
+        pinned: false,
+        createdAt: '2026-10-25',
+        updatedAt: '2026-10-25'
+      }
+    };
+
+    expect(() => CardSchema.parse(invalidCard)).toThrow(/12 words/);
+  });
+
   it('rejects cards with an invalid role', () => {
     const invalidCard = {
       id: 'proj1:src/unknown',

@@ -6,6 +6,10 @@ import {
   ReviewRequestSchema,
   InboxItemSchema,
   FindForTaskResponseSchema,
+  ProjectsResponseSchema,
+  TreeResponseSchema,
+  CardUpdateRequestSchema,
+  InboxResponseSchema,
   type Report,
   type InboxItem
 } from '../index.js';
@@ -112,5 +116,56 @@ describe('Contracts & Reports Schemas', () => {
     const parsed = FindForTaskResponseSchema.parse(taskResponse);
     expect(parsed.files).toHaveLength(1);
     expect(parsed.confidence).toBe('high');
+  });
+
+  it('validates REST API response and request payloads', () => {
+    const projectsRes = {
+      projects: [
+        {
+          id: 'proj_1',
+          root: '/repos/my-app',
+          name: 'my-app',
+          branch: 'main',
+          activeAgents: ['Claude Code'],
+          freshnessPercent: 95,
+          outdatedCount: 2,
+          unreportedCount: 0,
+          lastOpenedAt: '2026-10-25T15:00:00Z'
+        }
+      ]
+    };
+    expect(ProjectsResponseSchema.parse(projectsRes).projects).toHaveLength(1);
+
+    const treeRes = {
+      projectId: 'proj_1',
+      root: [
+        {
+          id: 'proj_1:src',
+          path: 'src',
+          name: 'src',
+          isFolder: true,
+          status: 'Fresh' as const
+        }
+      ],
+      totalFiles: 42,
+      noiseCount: 1500
+    };
+    expect(TreeResponseSchema.parse(treeRes).totalFiles).toBe(42);
+
+    const cardUpdate = {
+      path: 'src/auth',
+      expectedVersion: 2,
+      authored: {
+        why: 'Updated why statement'
+      },
+      pinned: true
+    };
+    expect(CardUpdateRequestSchema.parse(cardUpdate).pinned).toBe(true);
+
+    const inboxRes = {
+      items: [],
+      totalCount: 0
+    };
+    expect(InboxResponseSchema.parse(inboxRes).totalCount).toBe(0);
   });
 });

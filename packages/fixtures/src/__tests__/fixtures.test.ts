@@ -1,9 +1,12 @@
 import { describe, it, expect } from 'vitest';
+import fs from 'node:fs';
+import path from 'node:path';
 import { CardSchema } from '@orient/schema';
 import {
   nextjsGoldenCard,
   fastapiGoldenCard,
-  springbootGoldenCard
+  springbootGoldenCard,
+  getFixturePath
 } from '../index.js';
 
 describe('Golden Multi-Stack Fixtures', () => {
@@ -26,5 +29,18 @@ describe('Golden Multi-Stack Fixtures', () => {
     expect(parsed.authored.role).toBe('entrypoint');
     expect(parsed.derived.languages).toContain('java');
     expect(parsed.derived.surface.ports).toContain(8080);
+  });
+
+  it('provides physical fixture repository directories on disk', () => {
+    const nextjsPath = getFixturePath('nextjs');
+    expect(fs.existsSync(path.join(nextjsPath, 'package.json'))).toBe(true);
+    expect(fs.existsSync(path.join(nextjsPath, 'app/api/auth/route.ts'))).toBe(true);
+
+    const fastapiPath = getFixturePath('fastapi');
+    expect(fs.existsSync(path.join(fastapiPath, 'pyproject.toml'))).toBe(true);
+    expect(fs.existsSync(path.join(fastapiPath, 'app/main.py'))).toBe(true);
+
+    const springPath = getFixturePath('springboot');
+    expect(fs.existsSync(path.join(springPath, 'pom.xml'))).toBe(true);
   });
 });

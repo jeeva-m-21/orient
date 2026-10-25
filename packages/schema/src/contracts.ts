@@ -1,5 +1,12 @@
 import { z } from 'zod';
-import { RoleEnum, ConfidenceEnum, DecisionSchema, StalenessStateEnum, SourceEnum } from './card.js';
+import {
+  RoleEnum,
+  ConfidenceEnum,
+  DecisionSchema,
+  StalenessStateEnum,
+  SourceEnum,
+  AuthoredDataSchema
+} from './card.js';
 
 export const ChangeKindEnum = z.enum(['created', 'modified', 'removed', 'moved']);
 export type ChangeKind = z.infer<typeof ChangeKindEnum>;
@@ -201,3 +208,50 @@ export const EventPayloadSchema = z.discriminatedUnion('type', [
   })
 ]);
 export type EventPayload = z.infer<typeof EventPayloadSchema>;
+
+// REST API Request & Response Schemas
+export const ProjectSchema = z.object({
+  id: z.string().min(1),
+  root: z.string().min(1),
+  name: z.string().min(1),
+  branch: z.string().default('main'),
+  activeAgents: z.array(z.string()).default([]),
+  freshnessPercent: z.number().min(0).max(100).default(100),
+  outdatedCount: z.number().int().nonnegative().default(0),
+  unreportedCount: z.number().int().nonnegative().default(0),
+  lastOpenedAt: z.string()
+});
+export type Project = z.infer<typeof ProjectSchema>;
+
+export const ProjectsResponseSchema = z.object({
+  projects: z.array(ProjectSchema)
+});
+export type ProjectsResponse = z.infer<typeof ProjectsResponseSchema>;
+
+export const RegisterProjectRequestSchema = z.object({
+  path: z.string().min(1)
+});
+export type RegisterProjectRequest = z.infer<typeof RegisterProjectRequestSchema>;
+
+export const TreeResponseSchema = z.object({
+  projectId: z.string(),
+  root: z.array(TreeNodeSchema),
+  totalFiles: z.number().int().nonnegative(),
+  noiseCount: z.number().int().nonnegative()
+});
+export type TreeResponse = z.infer<typeof TreeResponseSchema>;
+
+export const CardUpdateRequestSchema = z.object({
+  path: z.string(),
+  expectedVersion: z.number().int().positive(),
+  authored: AuthoredDataSchema.partial(),
+  pinned: z.boolean().optional()
+});
+export type CardUpdateRequest = z.infer<typeof CardUpdateRequestSchema>;
+
+export const InboxResponseSchema = z.object({
+  items: z.array(InboxItemSchema),
+  totalCount: z.number().int().nonnegative()
+});
+export type InboxResponse = z.infer<typeof InboxResponseSchema>;
+

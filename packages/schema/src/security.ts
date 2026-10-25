@@ -2,7 +2,8 @@ import path from 'node:path';
 
 const DANGEROUS_HTML_REGEX = /<(script|style|iframe|object|embed)[^>]*>[\s\S]*?<\/\1>/gi;
 const ANY_TAG_REGEX = /<[^>]+>/g;
-const PROMPT_INJECTION_REGEX = /\b(ignore\s+(all\s+)?(previous\s+)?instructions|system\s*:|assistant\s*:|you\s+are\s+now\b|act\s+as\s+a\b)/gi;
+const PROMPT_INJECTION_REGEX =
+  /\b(ignore\s+(all\s+)?(previous\s+|prior\s+|above\s+)?(instructions|rules|directives|constraints)|disregard\s+(all\s+)?(previous\s+|prior\s+|above\s+)?(instructions|rules)|system\s*:|assistant\s*:|human\s*:|user\s*:|\[\/?INST\]|<\|im_(start|end)\|>|you\s+are\s+now\b|act\s+as\s+a\b)/gi;
 
 /**
  * Strips HTML, dangerous script tags, and prompt injection directives from card text.
@@ -54,8 +55,11 @@ export function validateSafePath(repoRoot: string, targetPath: string): SafePath
     return { safe: false, normalizedPath: '', error: 'Path contains forbidden null byte' };
   }
 
+  // Normalize backslashes to forward slashes for cross-platform traversal defense
+  const normalizedInput = targetPath.replace(/\\/g, '/');
+
   const rootResolved = path.resolve(repoRoot);
-  const targetResolved = path.resolve(rootResolved, targetPath);
+  const targetResolved = path.resolve(rootResolved, normalizedInput);
 
   const relative = path.relative(rootResolved, targetResolved);
 
@@ -73,7 +77,7 @@ export function validateSafePath(repoRoot: string, targetPath: string): SafePath
 }
 
 const BLACKLIST_PATTERNS = [
-  /^\.env(\.[^.]+)?$/i,
+  /^\.env(\..+)?$/i,
   /\.pem$/i,
   /\.key$/i,
   /^id_rsa$/i,
