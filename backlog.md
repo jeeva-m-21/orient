@@ -93,7 +93,7 @@ Goal: Build resilient Tree-sitter WASM parsers for TypeScript, JavaScript, and P
   - Extract environment variable accesses (`os.getenv`, `os.environ`) and ports.
   - Acceptance Criteria: 100% accurate extraction against FastAPI test fixture files.
 
-- [ ] **SPRINT-2.4: Import Graph Resolution & Centrality Ranker**
+- [x] **SPRINT-2.4: Import Graph Resolution & Centrality Ranker**
   - Resolve relative and package import specifiers to workspace file paths.
   - Construct directed dependency graph and calculate in-degree/out-degree centrality.
   - Rank top 3 key files per folder by centrality.
