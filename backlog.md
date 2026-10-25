@@ -81,7 +81,7 @@ Goal: Build resilient Tree-sitter WASM parsers for TypeScript, JavaScript, and P
   - Bounded concurrency to `os.availableParallelism() - 1` (max 4).
   - Acceptance Criteria: Worker pool executes concurrent extractions without blocking main thread.
 
-- [ ] **SPRINT-2.2: TypeScript/JavaScript Language Extractor**
+- [x] **SPRINT-2.2: TypeScript/JavaScript Language Extractor**
   - Implement Tree-sitter queries for ESM/CJS imports and exports.
   - Implement route extractors for Express, Next.js App Router, and Fastify.
   - Extract environment variable accesses (`process.env.XYZ`) and ports.
