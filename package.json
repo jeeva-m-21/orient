@@ -10,6 +10,7 @@
     "test:watch": "vitest",
     "test:core": "vitest run packages/core",
     "test:extractors": "vitest run packages/extractors",
+    "test:daemon": "vitest run packages/daemon",
     "test:schema": "vitest run packages/schema",
     "lint": "eslint .",
     "clean": "pnpm --recursive --filter \"./packages/*\" run clean"

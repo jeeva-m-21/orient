@@ -141,13 +141,13 @@ Goal: Implement rebuildable SQLite caching, durable `.project/cards/` JSON stora
 
 Goal: Implement the Fastify server, loopback security boundaries, SSE event bus, official MCP tools, and CLI commands.
 
-- [ ] **SPRINT-4.1: Fastify Daemon Lifecycle & Zombie Cleanup**
+- [x] **SPRINT-4.1: Fastify Daemon Lifecycle & Zombie Cleanup**
   - Implement daemon startup binding strictly to `127.0.0.1`.
   - Port arbitration across `4477..4499`; write state to `~/.config/orient/daemon.json` (`0600` permissions).
   - Zombie lockfile cleanup: probe recorded PID with `process.kill(pid, 0)` on startup.
   - Acceptance Criteria: Daemon starts on 4477, survives stale lockfiles, and shuts down cleanly on SIGTERM/SIGINT.
 
-- [ ] **SPRINT-4.2: Layer 1 Entry Security & Path Traversal Guards**
+- [x] **SPRINT-4.2: Layer 1 Entry Security & Path Traversal Guards**
   - Generate 32-byte cryptographic bearer token per run.
   - Enforce token authentication on all HTTP endpoints and SSE streams.
   - Enforce strict `Host` and `Origin` allow-list checks.

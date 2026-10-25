@@ -1,0 +1,32 @@
+{
+  "name": "@orient/daemon",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc --noEmit",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {
+    "@fastify/cors": "^10.0.1",
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "@orient/core": "workspace:*",
+    "@orient/extractors": "workspace:*",
+    "@orient/schema": "workspace:*",
+    "fastify": "^5.12.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.7.2"
+  }
+}

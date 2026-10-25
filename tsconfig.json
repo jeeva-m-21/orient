@@ -4,6 +4,7 @@
     { "path": "./packages/schema" },
     { "path": "./packages/fixtures" },
     { "path": "./packages/core" },
-    { "path": "./packages/extractors" }
+    { "path": "./packages/extractors" },
+    { "path": "./packages/daemon" }
   ]
 }
