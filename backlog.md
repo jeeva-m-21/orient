@@ -111,7 +111,7 @@ Goal: Implement rebuildable SQLite caching, durable `.project/cards/` JSON stora
   - Implement auto-rebuild: if DB is deleted or corrupt, automatically rescan git and rebuild cache from durable cards.
   - Acceptance Criteria: Deleting `orient.db` and restarting daemon transparently restores all state.
 
-- [ ] **SPRINT-3.2: Durable Card Storage (`.project/cards/`)**
+- [x] **SPRINT-3.2: Durable Card Storage (`.project/cards/`)**
   - Read/write card files to `<repo>/.project/cards/<path-hash>.json`.
   - Maintain content-addressed version history.
   - Implement optional git-ref mirror (`refs/orient/cards`).
