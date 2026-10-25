@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
 import { getStatus, stopDaemon, runDoctor, runCiCheck } from './commands.js';
+import { applyAgentConfigs, removeAgentConfigs, detectAgents, type SupportedAgent } from './adapters.js';
 import { createOrientMcpServer } from '@orient/daemon';
 import { openDatabase, initDatabase } from '@orient/core';
 import path from 'node:path';
@@ -89,6 +90,47 @@ program
 
     console.log(result.reportOutput);
     if (!result.passed) {
+      process.exit(1);
+    }
+  });
+
+program
+  .command('init')
+  .description('Install agent adapters and configure MCP for detected coding agents')
+  .option('-a, --agent <agents...>', 'Explicit list of agents to configure (claude, cursor, windsurf, copilot, aider)')
+  .action(async (cmdOptions) => {
+    const cwd = process.cwd();
+    const result = await applyAgentConfigs(cwd, {
+      agents: cmdOptions.agent as SupportedAgent[] | undefined
+    });
+
+    if (result.configuredAgents.length === 0) {
+      console.log('No supported AI coding agents detected in current workspace.');
+      console.log('Detected agents: ' + (detectAgents(cwd).join(', ') || 'none'));
+      return;
+    }
+
+    console.log('✓ Orient Agent MCP Configuration Initialized');
+    console.log(`  Configured agents: ${result.configuredAgents.join(', ')}`);
+    console.log(`  Manifest recorded: ${result.manifestPath}`);
+    if (result.diffs.length > 0) {
+      console.log('\nDiff Preview:');
+      for (const d of result.diffs) {
+        console.log(d);
+      }
+    }
+  });
+
+program
+  .command('remove')
+  .description('Cleanly revert all agent adapter modifications to bit-for-bit original state')
+  .action(async () => {
+    const cwd = process.cwd();
+    const result = await removeAgentConfigs(cwd);
+    if (result.success) {
+      console.log(`✓ ${result.message}`);
+    } else {
+      console.error(`✗ ${result.message}`);
       process.exit(1);
     }
   });

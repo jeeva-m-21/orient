@@ -298,7 +298,7 @@ Goal: Implement the high-level Overview screen, Container/Neighborhood diagrams 
 
 Goal: Build agent config installers (`orient init`), execute Playwright end-to-end user persona testing, verify performance benchmarks, and assemble production distribution.
 
-- [ ] **SPRINT-8.1: Agent Adapters & Config Manifest (`orient init` / `remove`)**
+- [x] **SPRINT-8.1: Agent Adapters & Config Manifest (`orient init` / `remove`)**
   - Implement detection and installers for Claude Code (`.claude/`), Cursor (`.cursor/`), Windsurf (`.windsurf/`), Copilot, and Aider.
   - Show formatted visual diff preview before writing configs.
   - Record written changes in config manifest (`path`, `before-hash`, `inserted-block-id`).
