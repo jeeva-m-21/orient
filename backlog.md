@@ -219,31 +219,36 @@ Goal: Build the calm, accessible, keyboard-driven web interface with virtualized
   - Establish semantic color isolation (status colors separate from agent identity colors).
   - Acceptance Criteria: Token system verified against design specs; zero hardcoded hex colors outside token definition.
 
-- [ ] **SPRINT-6.2: Virtualized Repository Tree Component**
+- [x] **SPRINT-6.2: Virtualized Repository Tree Component**
   - Integrate `react-arborist` for virtualized rendering of large trees (up to 50,000 files).
   - Render role glyphs, file counts, agent activity pulses, and status dots.
   - Noise group row: single collapsed line for dependencies and build artifacts.
   - Full keyboard navigation: Up/Down arrows, Left/Right expand/collapse, `Enter` select, `o` open in editor, `r` mark reviewed.
   - Acceptance Criteria: Tree scrolls smoothly at 60fps on 10,000-file repository fixture.
 
-- [ ] **SPRINT-6.3: Signature 10-Slot Card Component**
+- [x] **SPRINT-6.3: Signature 10-Slot Card Component**
   - Header: path in code font, one-line purpose, badges row (status, source, agent, confidence).
   - Body slots in strict order: 1. One thing; 2. Role + evidence tooltip; 3. Key files; 4. Depends on / Used by; 5. Surface; 6. Conventions; 7. Do not; 8. Why / Origin; 9. Health; 10. Evidence citations.
   - Outdated banner at top showing precise delta (`+N exports, -M exports`) with preserved dimmed text.
   - Tabs: Card, Code, Changes, Links.
   - Acceptance Criteria: Card renders identically across folders; slots never shift order; tooltips cite verified evidence.
 
-- [ ] **SPRINT-6.4: Code Preview Drawer & Editor Integration**
+- [x] **SPRINT-6.4: Code Preview Drawer & Editor Integration**
   - Implement drawer previewing syntax-highlighted code via Shiki.
   - Implement deep links to IDEs (`vscode://file/...`, Cursor, JetBrains).
   - "Copy context" button copying an agent-ready markdown summary.
   - Acceptance Criteria: Clicking a key file opens syntax-highlighted preview with line numbers and editor launch button.
 
-- [ ] **SPRINT-6.5: Command Palette (`Cmd/Ctrl+K`)**
+- [x] **SPRINT-6.5: Command Palette (`Cmd/Ctrl+K`)**
   - Global modal palette powered by `cmdk` (Radix).
   - 3 result groups: 1. Go to file/folder; 2. Commands (toggle density, refresh, export); 3. Find for task (retrieval list, not chat).
   - `Enter` opens in UI; `Cmd+Enter` opens in editor.
   - Acceptance Criteria: `Cmd+K` opens instantly; task search returns ranked results in $< 100\text{ ms}$.
+
+- [x] **SPRINT-6.6: Playwright E2E UI Journey Verification**
+  - Setup Playwright test harness for local web UI.
+  - Test journeys: 1. Open repository & render shell/tree/card; 2. Keyboard tree navigation & card update; 3. Command Palette search & jump; 4. Code drawer open; 5. Focus mode toggle.
+  - Acceptance Criteria: 100% passing Playwright journeys with recorded screenshots in artifact directory.
 
 ---
 

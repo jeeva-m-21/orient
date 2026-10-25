@@ -9,6 +9,11 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "default": "./dist/index.js"
+    },
+    "./cards": {
+      "types": "./dist/goldenCards.d.ts",
+      "import": "./dist/goldenCards.js",
+      "default": "./dist/goldenCards.js"
     }
   },
   "scripts": {

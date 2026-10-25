@@ -13,6 +13,7 @@
     "test:daemon": "vitest run packages/daemon",
     "test:cli": "vitest run packages/cli",
     "test:web": "vitest run packages/web",
+    "test:e2e": "pnpm --filter @orient/web run test:e2e",
     "test:schema": "vitest run packages/schema",
     "lint": "eslint .",
     "clean": "pnpm --recursive --filter \"./packages/*\" run clean"
